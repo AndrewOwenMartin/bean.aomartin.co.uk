@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Markdown from 'react-markdown'
-import introMd from '/intro.md?raw'
-import exampleMd from '/markdown-example.md?raw'
+import introMd from '/markdown/intro.md?raw'
+import exampleMd from '/markdown/markdown-example.md?raw'
 
 function App() {
 
@@ -16,7 +16,7 @@ function App() {
       <p>I'm going to try to write an intro to SDS.</p>
       <Markdown>{introMd}</Markdown>
       </section>
-      {/*<Markdown>{exampleMd}</Markdown>*/}
+      <Markdown>{exampleMd}</Markdown>
 
     </>
   )
