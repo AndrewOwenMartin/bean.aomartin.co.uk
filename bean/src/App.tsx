@@ -1,16 +1,23 @@
 import { useState } from 'react'
-import './App.css'
+import Markdown from 'react-markdown'
+import introMd from '/intro.md?raw'
+import exampleMd from '/markdown-example.md?raw'
 
 function App() {
+
+  const md = '# Hi, *Pluto*!'
+
 
   return (
     <>
       <h1>Hello world</h1>
-      <section id="center"></section>
+      <section>
       <h2>Content</h2>
-      <p>This website is hosttsesdgguuesdgklztdm.0yegp7s f,</p>
+      <p>I'm going to try to write an intro to SDS.</p>
+      <Markdown>{introMd}</Markdown>
+      </section>
+      {/*<Markdown>{exampleMd}</Markdown>*/}
 
-      <section id="spacer"></section>
     </>
   )
 }
