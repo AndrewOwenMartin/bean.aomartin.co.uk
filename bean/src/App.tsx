@@ -1,22 +1,37 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Markdown from 'react-markdown'
-import introMd from '/markdown/intro.md?raw'
-import exampleMd from '/markdown/markdown-example.md?raw'
+const pages = import.meta.glob('/markdown/*.md', { as: 'raw' })
+
+const usePage = (init) => {
+  const [page, setPage] = useState()
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    init().then(newPage => {
+      setPage(newPage)
+      setLoaded(true)
+    })
+  })
+
+  return {
+    page,
+    loaded,
+  }
+}
+
+const Page = (props) => {
+  const page = usePage(pages["/markdown/"+props.name])
+  return (page.loaded ? <Markdown>{page.page}</Markdown> : <p>Loading {props.name}</p>)
+}
 
 function App() {
 
-  const md = '# Hi, *Pluto*!'
+  const intro = usePage(pages["/markdown/intro-to-sds.md"])
 
 
   return (
     <>
-      <h1>Hello world</h1>
-      <section>
-      <h2>Content</h2>
-      <p>I'm going to try to write an intro to SDS.</p>
-      <Markdown>{introMd}</Markdown>
-      </section>
-      <Markdown>{exampleMd}</Markdown>
+      <Page name="intro-to-sds.md" />
 
     </>
   )
