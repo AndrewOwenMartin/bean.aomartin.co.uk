@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Markdown from 'react-markdown'
-const pages = import.meta.glob('/markdown/*.md', { as: 'raw' })
+const pages = import.meta.glob('/markdown/*.md', { 'query': '?raw', 'import': 'default' })
 
 const usePage = (init) => {
   const [page, setPage] = useState()
