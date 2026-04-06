@@ -9,7 +9,10 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] })
   ],
   server:{
-	  host: "0.0.0.0",
+    host: "0.0.0.0",
   },
   assetsInclude: ['**/*.md'],
+  build: {
+    sourcemap: true,
+  }
 })
