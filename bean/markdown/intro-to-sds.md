@@ -46,7 +46,7 @@ When SDS was introduced, a story was created to explain it, we call this the Res
 > impressions. If the experience was good, he also adopts this restaurant as
 > his choice. Otherwise he simply selects another restaurant at random from
 > those listed in ‘Yellow Pages’.  Using this strategy it is found that very
-> rapidly [a] significant number of dele- gates congregate around the best
+> rapidly [a] significant number of delegates congregate around the best
 > restaurant in town.
 
 The process of the restaurant game has a number of notable features. Within
