@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import Markdown from 'react-markdown'
 const pages = import.meta.glob('/markdown/*.md', { 'query': '?raw', 'import': 'default' })
+import 'katex/dist/katex.min.css';
+import { DiffAnim } from './diff-anim/DiffAnim';
 
 const usePage = (init) => {
   const [page, setPage] = useState()
@@ -31,6 +33,7 @@ function App() {
 
   return (
     <>
+      <DiffAnim />
       <Page name="intro-to-sds.md" />
 
     </>
