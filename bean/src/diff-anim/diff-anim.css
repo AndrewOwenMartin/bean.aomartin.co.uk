@@ -1,8 +1,8 @@
 .container {
-  width: 400px;
-  height: 400px;
+  max-width: 50em;
   background-color: #00888811;
   overflow: hidden;
+  padding: 1em;
 }
 
 .explain-box {

@@ -37,7 +37,6 @@ const steps = [
   "newHyp",
 ];
 type Step = (typeof steps)[number];
-// type Step = 'nextAgent' | 'checkActive' | 'pollAgent' | ';
 
 const replaceItemInList = (list, index, newItem) => {
   return [...list.slice(0, index), newItem, ...list.slice(index + 1)];
@@ -49,7 +48,7 @@ const initAgents = (agentCount, hypCount) => {
     .map(() => randomAgent(hypCount));
 };
 
-const useDiffAnim = (agentCount, hypCount) => {
+const useDiffAnim = ({ agentCount, hypCount }) => {
   const [agents, setAgents] = React.useState(initAgents(agentCount, hypCount));
 
   const [currentAgent, setCurrentAgent] = React.useState(0);
@@ -65,7 +64,6 @@ const useDiffAnim = (agentCount, hypCount) => {
   const [isAutoStep, setIsAutoStep] = React.useState(false);
 
   const step = () => {
-    //setCurrentStepIndex(prevStepIndex => (prevStepIndex + 1)%steps.length)
     let nextStep;
     if (currentStep === "nextAgent") {
       nextStep = "checkActive";
@@ -170,19 +168,13 @@ const ExplainBox = (props) => {
             Agent {agentNumber} polls agent {polledNumber}
           </div>
           <div>
-            {polled.active
-              ? `Active: True. Hyp: ${polled.hyp}`
-              : "Active: False"}
+            {polled.active ? `Active: Yes. Hyp: ${polled.hyp}` : "Active: No"}
           </div>
         </div>
       )}
       {props.currentStep === "polledActivity" && (
         <div>
           <div>Polled agent is {polled.active ? "active" : "inactive"}</div>
-          {/*<div>
-            Polled Number: {polledNumber}. Active:{" "}
-            {polled.active ? "True" : "False"}. Hyp: {polled.hyp}.
-          </div>*/}
           {polled.active ? (
             <div>Copy hypothesis</div>
           ) : (
@@ -196,13 +188,17 @@ const ExplainBox = (props) => {
           {polledNumber}
         </div>
       )}
-      {props.currentStep === "newHyp" && <div>Step: {props.currentStep}</div>}
+      {props.currentStep === "newHyp" && (
+        <div>
+          Agent {agentNumber} creates new hypothesis '{agent.hyp}'
+        </div>
+      )}
     </div>
   );
 };
 
 export const DiffAnim = () => {
-  const state = useDiffAnim(3, 10);
+  const state = useDiffAnim({ agentCount: 10, hypCount: 10 });
 
   return (
     <>
