@@ -198,7 +198,7 @@ const ExplainBox = (props) => {
 };
 
 export const DiffAnim = () => {
-  const state = useDiffAnim({ agentCount: 10, hypCount: 10 });
+  const state = useDiffAnim({ agentCount: 5, hypCount: 10 });
 
   return (
     <>
