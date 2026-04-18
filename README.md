@@ -8,5 +8,5 @@ Run dev server with
 > npm run dev
 
 To deploy
-1. As amartin cd into bean.aomartin.co.uk/bean and run `npx vite build`
+1. As amartin cd into bean.aomartin.co.uk/bean and run `./build.sh`
 2. As root cd into bean.aomartin.co.uk and run `deploy.sh`
