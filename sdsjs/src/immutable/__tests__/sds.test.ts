@@ -16,35 +16,32 @@ test("TMUniform with one element returns that element", () => {
 
 test("DPassive with active agent", () => {
   const agent = { active: true, hyp: 0 };
-  expect(DPassive(() => 0, agent, [])).toBe(agent);
+  expect(DPassive(() => 0, agent, [])).toBe(0);
 });
 
 test("DPassive with inactive agent and active polled agent", () => {
   const agent = { active: false, hyp: 0 };
   const polled = { active: true, hyp: 1 };
-  expect(DPassive(() => 0, agent, [polled])).toEqual({
-    active: false,
-    hyp: 1,
-  });
+  expect(DPassive(() => 0, agent, [polled])).toBe(1);
 });
 
 test("DPassive with inactive agent and inactive polled agent", () => {
   const agent = { active: false, hyp: 0 };
   const polled = { active: false, hyp: 1 };
   const DH = () => 2;
-  expect(DPassive(DH, agent, [polled])).toEqual({ active: false, hyp: 2 });
+  expect(DPassive(DH, agent, [polled])).toBe(2);
 });
 
 test("DBoolean with passing test", () => {
-  const agent = { active: false, hyp: 1 };
+  const hyp = 1;
   const TM = () => (hyp: number) => hyp === 1;
-  expect(TBoolean(TM, agent)).toEqual({ active: true, hyp: 1 });
+  expect(TBoolean(TM, 1)).toEqual({ active: true, hyp });
 });
 
 test("DBoolean with failing test", () => {
-  const agent = { active: false, hyp: 1 };
+  const hyp = 1;
   const TM = () => (hyp: number) => hyp === 0;
-  expect(TBoolean(TM, agent)).toEqual({ active: false, hyp: 1 });
+  expect(TBoolean(TM, 1)).toEqual({ active: false, hyp });
 });
 
 test("makeHFixed with 0 iterations", () => {
