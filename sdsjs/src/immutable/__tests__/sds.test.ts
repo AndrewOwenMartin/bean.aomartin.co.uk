@@ -1,14 +1,9 @@
 import { initSwarm } from "../../shared/swarm";
-import { Microtest } from "../../shared/type";
-import { countClusters} from "../../analysis/clusters";
-import {
-  SDSStandard,
-  DHUniform,
-  TMUniform,
-  DPassive,
-  TBoolean,
-  makeHFixed,
-} from "../sds";
+import { countClusters } from "../../analysis/clusters";
+import { SDSStandard } from "../sds";
+import { DHUniform, DPassive } from "../diffusion";
+import { makeHFixed } from "../halting";
+import { TMUniform, TBoolean, Microtest } from "../testing";
 
 test("DHUniform 1 returns zero", () => {
   expect(DHUniform(1)).toBe(0);
@@ -21,13 +16,13 @@ test("TMUniform with one element returns that element", () => {
 
 test("DPassive with active agent", () => {
   const agent = { active: true, hyp: 0 };
-  expect(DPassive(undefined, agent, [])).toBe(agent);
+  expect(DPassive(() => 0, agent, [])).toBe(agent);
 });
 
 test("DPassive with inactive agent and active polled agent", () => {
   const agent = { active: false, hyp: 0 };
   const polled = { active: true, hyp: 1 };
-  expect(DPassive(undefined, agent, [polled])).toEqual({
+  expect(DPassive(() => 0, agent, [polled])).toEqual({
     active: false,
     hyp: 1,
   });
@@ -80,8 +75,8 @@ test("init swarm", () => {
 test("sds standard", () => {
   const agentCount = 100;
   const mySearchSpace: string =
-  // 0         10        20        30        40        50
-  // 012345678901234567890123456789012345678901234567890123456789
+    // 0         10        20        30        40        50
+    // 012345678901234567890123456789012345678901234567890123456789
     "xxxxxhexloworldakllajadsweklhheaekfjllkahelehlehlehlexxx";
   const model: string = "helloworld";
 
@@ -91,21 +86,21 @@ test("sds standard", () => {
       return (hyp: number) => mySearchSpace[hyp + index] === targetElement;
     });
 
-  const SDS = SDSStandard(mySearchSpace.length, myMicrotests);
+  const maxIterations = 100;
+  const SDS = SDSStandard(mySearchSpace.length, myMicrotests, maxIterations);
 
   let swarm = initSwarm(agentCount);
   swarm = SDS(swarm);
 
   swarm.forEach((agent, index) => console.log({ index, agent }));
 
-  const clusters = countClusters(swarm)
+  const clusters = countClusters(swarm);
 
-  expect(clusters['5']).toBeGreaterThan(clusters['inactive'])
+  expect(clusters["5"]).toBeGreaterThan(clusters["inactive"]);
 
-  const clusterNames = Object.keys(clusters)
-  const clusterSizes = Object.values(clusters)
-  const optimalClusterLocation = clusterNames.indexOf('5')
-  const optimalClusterSize = clusterSizes[optimalClusterLocation]
-  expect(Math.max(...clusterSizes)).toEqual(optimalClusterSize)
-
+  const clusterNames = Object.keys(clusters);
+  const clusterSizes = Object.values(clusters);
+  const optimalClusterLocation = clusterNames.indexOf("5");
+  const optimalClusterSize = clusterSizes[optimalClusterLocation];
+  expect(Math.max(...clusterSizes)).toEqual(optimalClusterSize);
 });
