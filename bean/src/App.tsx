@@ -12,6 +12,7 @@ function App() {
       <Page name="intro-to-sds.md" />
       <h1>Diffusion Phase</h1>
       <DiffAnim />
+      <Page name="sds-stories.md" />
       <Page name="future-work.md" />
       <h1>Mathematical comparison</h1>
       <p>
