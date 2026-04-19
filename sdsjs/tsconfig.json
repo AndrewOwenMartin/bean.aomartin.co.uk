@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2023",
+    "declaration": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "noImplicitAny": false,
+    "types": ["node", "jest"]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
+  ]
+}
