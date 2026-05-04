@@ -4,11 +4,30 @@ import { makeHFixed } from "./halting";
 import { ISynchronous } from "./iteration";
 import { TMUniform, TBoolean, Microtest } from "./testing";
 
+type SDSDef = (
+  I: (swarm: Swarm) => Swarm,
+  H: () => boolean,
+  swarm: Swarm,
+) => Swarm;
+
+export const SDS: SDSDef = (
+  I: (swarm: Swarm) => Swarm,
+  H: () => boolean,
+  swarm: Swarm,
+) => {
+  while (!H()) {
+    swarm = I(swarm);
+  }
+  return swarm;
+};
+
+type SDSSearch = (swarm: Swarm) => Swarm
+
 export const SDSStandard = (
   hypCount: number,
   microtests: Microtest[],
   maxIterations: number,
-) => {
+): SDSSearch => {
   const DH = () => DHUniform(hypCount);
   const D = (agent: Agent, swarm: Swarm) => DPassive(DH, agent, swarm);
   const TM = () => TMUniform(microtests);
@@ -19,11 +38,4 @@ export const SDSStandard = (
     swarm = SDS(I, H, swarm);
     return swarm;
   };
-};
-
-const SDS = (I: (swarm: Swarm) => Swarm, H: () => boolean, swarm: Swarm) => {
-  while (!H()) {
-    swarm = I(swarm);
-  }
-  return swarm;
 };

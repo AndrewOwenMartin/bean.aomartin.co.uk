@@ -1,4 +1,4 @@
-import { Agent, Swarm } from "./type";
+import { Agent, Hyp, Swarm } from "./type";
 
 export const choice = <T>(array: T[]): T => {
   return array[randInt(array.length)];
@@ -15,3 +15,4 @@ export const randChance = (p: number): boolean => {
 export const poll = (swarm: Swarm): Agent => {
   return choice(swarm);
 };
+

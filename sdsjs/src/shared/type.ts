@@ -4,4 +4,3 @@ export interface Agent {
   active: boolean;
 }
 
-export type Swarm = Agent[];
