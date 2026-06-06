@@ -12,6 +12,10 @@ Monorepo with two packages linked via npm workspaces:
 
 `bean` imports `sdsjs` as a workspace dependency (`import { SDSStandard } from 'sds'`). It does not reimplement SDS logic.
 
+## Environment
+
+The `claude` user on the dev machine uses [volta](https://volta.sh) to manage Node — this is what puts `node`, `npm`, and `npx` on PATH in non-login shells. It is not a project dependency; any Node installation works.
+
 ## Commands
 
 ### sdsjs
@@ -24,7 +28,7 @@ npm run build                                         # tsc
 npm run lint                                          # prettier then eslint
 ```
 
-`test.sh` initialises nvm before invoking jest, which is necessary in non-login shells (e.g. Claude Code's Bash tool). Always use it instead of calling `npm test` directly.
+`test.sh` uses `npx jest` directly when a path is given, so the hardcoded `./src` glob in the npm script doesn't swallow the argument. Always use it instead of calling `npm test` directly.
 
 ### bean
 

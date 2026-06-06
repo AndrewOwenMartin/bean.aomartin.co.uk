@@ -1,0 +1,5 @@
+{
+  "name": "bean.aomartin.co.uk",
+  "private": true,
+  "workspaces": ["bean", "sdsjs"]
+}

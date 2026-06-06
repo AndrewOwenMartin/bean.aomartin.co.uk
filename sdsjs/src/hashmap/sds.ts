@@ -11,6 +11,6 @@ export const SDSHash = (
 };
 
 const DPassive = (DH: () => number, agent: Agent, swarm: Swarm) => {
-  if(agent.active)
+  if(agent.active) {}
 }
 

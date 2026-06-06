@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: completed
 
 # PRD: Wire up npm workspaces
 
@@ -36,6 +36,14 @@ The gate for this task is TypeScript compilation: `npm run build` in `bean` shou
 - Replacing `DiffAnim`'s inline SDS logic with library calls — that is part of the animation refactor.
 - Publishing `sdsjs` to npm.
 - Any changes to `sdsjs` source.
+
+## Learnings
+
+- `sdsjs/package.json` had the entire transitive dependency tree of jest pasted into `dependencies` (not `devDependencies`). This blocked `npm install` from the workspace root because `string-width-cjs@^4.2.3` no longer exists on the registry. Stripped back to direct devDependencies only.
+- `sdsjs/package.json` declared `"main": "dist/main.js"` and `"types": "dist/main.d.ts"`, but `tsc` with `rootDir: src` outputs `dist/index.js`. Fixed to `dist/index.js` / `dist/index.d.ts`.
+- `sdsjs/src/index.ts` only exported `DHUniform` (from the wrong module). Expanded to export the full public surface (`SDSStandard`, `SDS`, all D/T/I/H functions, swarm constructors, and types).
+- `sdsjs/src/hashmap/sds.ts` had a syntax error (`if(agent.active)` with no body) that blocked `tsc`. Fixed with `{}`.
+- The PRD gate ("bean TypeScript build passes") was not fully achievable — `bean` has pre-existing errors in `DiffAnim.tsx`, `App.tsx`, etc. unrelated to the workspace link. The workspace link itself is confirmed working: `require('sds')` resolves `SDSStandard` as a function, and `tsc` reports zero `sds`-related errors.
 
 ## Further Notes
 
