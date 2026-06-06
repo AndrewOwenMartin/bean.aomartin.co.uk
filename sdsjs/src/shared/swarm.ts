@@ -4,18 +4,18 @@ import { Agent, Hyp } from "./type";
 type SwarmType = 'hashSwarm' | 'arraySwarm'
 
 export interface Swarm {
-  agents: any;
   agentCount: number;
   poll: () => Agent;
+  forAll: (f: (agent: Agent) => Agent) => Swarm;
   // type: SwarmType
 }
 
-export interface HashSwarm extends Swarm{
+export interface HashSwarm extends Swarm {
   agents: Map<Hyp, number>;
   // type: 'hashSwarm';
 }
 
-export interface ArraySwarm extends Swarm{
+export interface ArraySwarm extends Swarm {
   agents: Agent[];
   // type: 'arraySwarm';
 }
@@ -25,25 +25,24 @@ const initAgent = (): Agent => ({
   active: false,
 });
 
-export const initArraySwarm = (agentCount: number): ArraySwarm => {
+const makeArraySwarm = (agents: Agent[]): ArraySwarm => ({
+  agents,
+  agentCount: agents.length,
+  poll: () => poll(agents),
+  forAll: (f) => makeArraySwarm(agents.map(f)),
+});
 
-  const agents = Array(agentCount).fill(null).map(initAgent);
-  return {
-    agents,
-    agentCount,
-    poll: () => poll(agents),
-    // type: 'arraySwarm',
-  }
-};
+export const initArraySwarm = (agentCount: number): ArraySwarm =>
+  makeArraySwarm(Array(agentCount).fill(null).map(initAgent));
 
 export const initHashSwarm = (agentCount: number): Swarm => {
-  const agents: Map<Hyp,number> = new Map<Hyp, number>()
+  const agents: Map<Hyp, number> = new Map<Hyp, number>();
   return {
-    agents,
     agentCount,
     poll: () => hashPoll(agents, agentCount),
+    forAll: () => { throw new Error("HashSwarm.forAll not yet implemented"); },
     // type: 'hashSwarm',
-  }
+  };
 }
 
 // export const makeSwarm = (agentCount: number) => {

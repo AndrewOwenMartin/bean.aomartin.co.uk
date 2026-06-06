@@ -18,11 +18,13 @@ Monorepo with two packages linked via npm workspaces:
 
 ```bash
 cd sdsjs
-npm test                                              # jest (all tests)
-npx jest src/immutable/__tests__/sds.test.ts          # single test file
+./test.sh                                             # jest (all tests) — use this, not npm test directly
+./test.sh src/immutable/__tests__/sds.test.ts         # single test file
 npm run build                                         # tsc
 npm run lint                                          # prettier then eslint
 ```
+
+`test.sh` initialises nvm before invoking jest, which is necessary in non-login shells (e.g. Claude Code's Bash tool). Always use it instead of calling `npm test` directly.
 
 ### bean
 

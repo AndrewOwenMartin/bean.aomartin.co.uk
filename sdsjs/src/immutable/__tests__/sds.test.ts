@@ -92,15 +92,13 @@ test("sds standard", () => {
   const maxIterations = 100;
   const SDS = SDSStandard(mySearchSpace.length, myMicrotests, maxIterations);
 
-  let swarm = initArraySwarm(agentCount);
-  swarm = SDS(swarm);
+  const swarm = initArraySwarm(agentCount);
+  const result = SDS(swarm) as ArraySwarm;
 
-  swarm.agents.forEach((agent, index) => console.log({ index, agent }));
+  const clusters = countClusters(result);
 
-  const clusters = countClusters(swarm);
-
-  const clusterNames = Object.keys(clusters);
-  const clusterSizes = Object.values(clusters);
+  const clusterNames = [...clusters.keys()].map(String);
+  const clusterSizes = [...clusters.values()];
   const optimalClusterLocation = clusterNames.indexOf("5");
   const optimalClusterSize = clusterSizes[optimalClusterLocation];
   expect(Math.max(...clusterSizes)).toEqual(optimalClusterSize);

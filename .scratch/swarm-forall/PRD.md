@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: completed
 
 # PRD: Swarm `forAll` abstraction and ISynchronous fix
 
@@ -41,6 +41,11 @@ Existing tests that access `swarm.agents` directly (e.g. to inspect agent state)
 - `HashSwarm.forAll` implementation — HashSwarm remains WIP.
 - Any changes to D, T, or H functions.
 - Changes to `bean`.
+
+## Learnings
+
+- The "init swarm" test (`sds.test.ts` lines 72–77) still accesses `swarm.agents` directly to check internal state. It's valid TypeScript because `swarm` is typed as `ArraySwarm` (concrete), not `Swarm` (interface) — so it compiles cleanly. The PRD advised deletion of such tests; that was left as optional cleanup since the integration test is the real gate. Consider deleting it in a future tidy-up pass.
+- `npm test -- <path>` does not isolate a single file when the `package.json` test script hardcodes a glob (`jest ./src`). The extra path appends rather than replaces. `test.sh` was updated to call `npx jest <path>` directly when arguments are passed.
 
 ## Further Notes
 
