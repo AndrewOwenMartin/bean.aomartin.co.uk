@@ -1,19 +1,18 @@
 import { DiffAnim } from "./diff-anim/DiffAnim";
-import { pages, usePage, Page } from "./page/Page";
-import { Inline, Block, MathExample } from "./formula/Example";
 import "katex/dist/katex.min.css";
-import { InlineMath, BlockMath } from "react-katex";
+import { InlineMath } from "react-katex";
+import IntroToSds from "../markdown/intro-to-sds.mdx";
+import SdsStories from "../markdown/sds-stories.mdx";
+import FutureWork from "../markdown/future-work.mdx";
 
 function App() {
-  const intro = usePage(pages["/markdown/intro-to-sds.md"]);
-
   return (
     <>
-      <Page name="intro-to-sds.md" />
+      <IntroToSds />
       <h1>Diffusion Phase</h1>
       <DiffAnim />
-      <Page name="sds-stories.md" />
-      <Page name="future-work.md" />
+      <SdsStories />
+      <FutureWork />
       <h1>Mathematical comparison</h1>
       <p>
         Comparison of the one step evolution function (c), minimum convergence

@@ -6,22 +6,11 @@ interface Agent {
   hyp: number;
 }
 
-interface Hyp {
-  score: number;
-}
-
-const initAgent = () => {
-  return {
-    active: false,
-    hyp: undefined,
-  };
-};
-
 const randomInt = (n: number) => Math.floor(Math.random() * n);
 
-const randomHyp = (hypCount) => randomInt(hypCount);
+const randomHyp = (hypCount: number) => randomInt(hypCount);
 
-const randomAgent = (hypCount) => {
+const randomAgent = (hypCount: number) => {
   return {
     active: Math.random() > 0.5,
     hyp: randomHyp(hypCount),
@@ -36,19 +25,17 @@ const steps = [
   "diffuse",
   "newHyp",
 ];
-type Step = (typeof steps)[number];
-
-const replaceItemInList = (list, index, newItem) => {
+const replaceItemInList = <T,>(list: T[], index: number, newItem: T): T[] => {
   return [...list.slice(0, index), newItem, ...list.slice(index + 1)];
 };
 
-const initAgents = (agentCount, hypCount) => {
+const initAgents = (agentCount: number, hypCount: number) => {
   return Array(agentCount)
-    .fill()
+    .fill(null)
     .map(() => randomAgent(hypCount));
 };
 
-const useDiffAnim = ({ agentCount, hypCount }) => {
+const useDiffAnim = ({ agentCount, hypCount }: { agentCount: number; hypCount: number }) => {
   const [agents, setAgents] = React.useState(initAgents(agentCount, hypCount));
 
   const [currentAgent, setCurrentAgent] = React.useState(0);
@@ -60,11 +47,11 @@ const useDiffAnim = ({ agentCount, hypCount }) => {
   const pollingStates = ["pollAgent", "polledActivity", "diffuse"];
   const isPollingState = pollingStates.includes(currentStep);
   const newHyp = () => randomHyp(hypCount);
-  const timer = React.useRef(undefined);
+  const timer = React.useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const [isAutoStep, setIsAutoStep] = React.useState(false);
 
   const step = () => {
-    let nextStep;
+    let nextStep: string = currentStep;
     if (currentStep === "nextAgent") {
       nextStep = "checkActive";
     } else if (currentStep === "checkActive") {
@@ -86,7 +73,7 @@ const useDiffAnim = ({ agentCount, hypCount }) => {
         newAgent.hyp = newHyp();
         nextStep = "newHyp";
       }
-      const replaceAgent = (agents) =>
+      const replaceAgent = (agents: Agent[]) =>
         replaceItemInList(agents, currentAgent, newAgent);
       setAgents(replaceAgent);
     } else if (currentStep === "diffuse") {
@@ -142,7 +129,15 @@ const Agent = (props: Agent) => {
   );
 };
 
-const ExplainBox = (props) => {
+interface ExplainBoxProps {
+  agentIndex: number;
+  polledIndex: number;
+  polledAgent: Agent;
+  agents: Agent[];
+  currentStep: string;
+}
+
+const ExplainBox = (props: ExplainBoxProps) => {
   const agentNumber = props.agentIndex + 1;
   const polledNumber = props.polledIndex + 1;
   const agent = props.agents[props.agentIndex];

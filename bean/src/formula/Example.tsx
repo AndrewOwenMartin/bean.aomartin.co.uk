@@ -9,6 +9,6 @@ export const Block = () => {
   return <BlockMath>\int_0^\infty x^2 dx</BlockMath>;
 };
 
-export const MathExample = (props) => {
+export const MathExample = (props: { children: string }) => {
   return <BlockMath>{props.children}</BlockMath>;
 };
