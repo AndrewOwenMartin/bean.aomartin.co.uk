@@ -1,4 +1,4 @@
-import { initSwarm } from "../../shared/swarm";
+import { ArraySwarm, initArraySwarm } from "../../shared/swarm";
 import { countClusters } from "../../analysis/clusters";
 import { SDSStandard } from "../sds";
 import { DHUniform, DPassive } from "../diffusion";
@@ -16,20 +16,25 @@ test("TMUniform with one element returns that element", () => {
 
 test("DPassive with active agent", () => {
   const agent = { active: true, hyp: 0 };
-  expect(DPassive(() => 0, agent, [])).toBe(0);
+  const swarm = initArraySwarm(0)
+  expect(DPassive(() => 0, agent, swarm)).toBe(0);
 });
 
 test("DPassive with inactive agent and active polled agent", () => {
-  const agent = { active: false, hyp: 0 };
+  const swarm = initArraySwarm(1)
   const polled = { active: true, hyp: 1 };
-  expect(DPassive(() => 0, agent, [polled])).toBe(1);
+  swarm.agents[0] = polled
+  const agent = { active: false, hyp: 0 };
+  expect(DPassive(() => 0, agent, swarm)).toBe(1);
 });
 
 test("DPassive with inactive agent and inactive polled agent", () => {
-  const agent = { active: false, hyp: 0 };
+  const swarm = initArraySwarm(1)
   const polled = { active: false, hyp: 1 };
+  swarm.agents[0] = polled
+  const agent = { active: false, hyp: 0 };
   const DH = () => 2;
-  expect(DPassive(DH, agent, [polled])).toBe(2);
+  expect(DPassive(DH, agent, swarm)).toBe(2);
 });
 
 test("DBoolean with passing test", () => {
@@ -65,9 +70,10 @@ test("makeHFixed with 3 iterations", () => {
   expect(H()).toBe(true);
 });
 test("init swarm", () => {
-  const swarm = initSwarm(5);
-  expect(swarm.length).toBe(5);
-  expect(swarm[0]).toEqual({ hyp: 0, active: false });
+  const swarm = initArraySwarm(5);
+  expect(swarm.agentCount).toBe(5);
+  expect(swarm.agents.length).toBe(5);
+  expect(swarm.agents[0]).toEqual({ hyp: 0, active: false });
 });
 test("sds standard", () => {
   const agentCount = 100;
@@ -86,14 +92,12 @@ test("sds standard", () => {
   const maxIterations = 100;
   const SDS = SDSStandard(mySearchSpace.length, myMicrotests, maxIterations);
 
-  let swarm = initSwarm(agentCount);
+  let swarm = initArraySwarm(agentCount);
   swarm = SDS(swarm);
 
-  swarm.forEach((agent, index) => console.log({ index, agent }));
+  swarm.agents.forEach((agent, index) => console.log({ index, agent }));
 
   const clusters = countClusters(swarm);
-
-  expect(clusters["5"]).toBeGreaterThan(clusters["inactive"]);
 
   const clusterNames = Object.keys(clusters);
   const clusterSizes = Object.values(clusters);

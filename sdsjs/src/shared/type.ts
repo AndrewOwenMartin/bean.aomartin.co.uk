@@ -3,4 +3,3 @@ export interface Agent {
   hyp: Hyp;
   active: boolean;
 }
-

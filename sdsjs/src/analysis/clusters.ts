@@ -1,13 +1,16 @@
-import { Swarm } from "../shared/type";
+import { ArraySwarm} from "../shared/swarm";
+import { Hyp } from "../shared/type";
 
-export const countClusters = (swarm: Swarm) => {
-  return swarm.reduce(
+export const countClusters = (swarm: ArraySwarm): Map<Hyp, number> => {
+  return swarm.agents.reduce(
     (counter, agent) => {
-      const cluster = agent.active ? agent.hyp : "inactive";
-      const size = counter[cluster] ?? 0;
-      counter[cluster] = size + 1;
+      if(agent.active){
+        const hyp = agent.hyp
+        const size = counter[hyp] ?? 0;
+        counter.set(hyp,size + 1);
+      }
       return counter;
     },
-    {} as { [key in string]: number },
+    new Map<Hyp, number>(),
   );
 };

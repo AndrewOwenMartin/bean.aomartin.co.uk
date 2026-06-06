@@ -1,14 +1,50 @@
-import { choice, randInt } from "./polling";
+import { choice, hashPoll, poll, randInt } from "./polling";
 import { Agent, Hyp } from "./type";
 
-const initAgent = () => ({
+type SwarmType = 'hashSwarm' | 'arraySwarm'
+
+export interface Swarm {
+  agents: any;
+  agentCount: number;
+  poll: () => Agent;
+  // type: SwarmType
+}
+
+export interface HashSwarm extends Swarm{
+  agents: Map<Hyp, number>;
+  // type: 'hashSwarm';
+}
+
+export interface ArraySwarm extends Swarm{
+  agents: Agent[];
+  // type: 'arraySwarm';
+}
+
+const initAgent = (): Agent => ({
   hyp: 0,
   active: false,
 });
 
-export const initSwarm = (agentCount: number): Agent[] => {
-  return Array(agentCount).fill(null).map(initAgent);
+export const initArraySwarm = (agentCount: number): ArraySwarm => {
+
+  const agents = Array(agentCount).fill(null).map(initAgent);
+  return {
+    agents,
+    agentCount,
+    poll: () => poll(agents),
+    // type: 'arraySwarm',
+  }
 };
+
+export const initHashSwarm = (agentCount: number): Swarm => {
+  const agents: Map<Hyp,number> = new Map<Hyp, number>()
+  return {
+    agents,
+    agentCount,
+    poll: () => hashPoll(agents, agentCount),
+    // type: 'hashSwarm',
+  }
+}
 
 // export const makeSwarm = (agentCount: number) => {
 //   const swarm = initSwarm(agentCount)
@@ -23,49 +59,3 @@ export const initSwarm = (agentCount: number): Agent[] => {
 //   }
 // }
 
-abstract class Swarm {
-  swarm!: Agent[] | Map<Hyp, number>;
-  agentCount!: number;
-
-  abstract poll(): Agent;
-}
-
-export class ArraySwarm extends Swarm {
-  swarm: Agent[];
-
-  constructor(agentCount: number) {
-    super();
-    const swarm = initSwarm(agentCount);
-    this.agentCount = agentCount;
-    this.swarm = swarm;
-  }
-  poll = (): Agent => {
-    return choice(this.swarm);
-  };
-}
-
-export class HashSwarm extends Swarm {
-  swarm: Map<number, number>;
-  agentCount: number;
-
-  constructor(agentCount: number) {
-    super();
-    this.agentCount = agentCount;
-    this.swarm = new Map();
-  }
-  poll = (): Agent => {
-    const agentIndex = randInt(this.agentCount);
-    let accumulator = 0;
-    let polledHyp = -1;
-    let active = false;
-    for (const [hyp, count] of this.swarm.entries()) {
-      accumulator += count;
-      if (accumulator > agentIndex) {
-        polledHyp = hyp;
-        active = true;
-        break;
-      }
-    }
-    return { hyp: polledHyp, active };
-  };
-}

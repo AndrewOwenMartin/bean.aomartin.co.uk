@@ -1,5 +1,6 @@
 import { poll, randChance, randInt } from "../shared/polling";
-import { Agent, Hyp, Swarm } from "../shared/type";
+import { Swarm } from "../shared/swarm";
+import { Agent, Hyp } from "../shared/type";
 export type Diffusion = (agent: Agent, swarm: Swarm) => Hyp;
 export type NewHyp = () => Hyp;
 
@@ -8,7 +9,7 @@ export const DPassive = (DH: NewHyp, agent: Agent, swarm: Swarm): Hyp => {
     return agent.hyp;
   }
 
-  const polled = poll(swarm);
+  const polled = swarm.poll()
 
   const hyp = polled.active ? polled.hyp : DH();
 
@@ -28,7 +29,7 @@ export const DChance = (
 };
 
 export const DContextFree = (DH: NewHyp, agent: Agent, swarm: Swarm): Hyp => {
-  const polled = poll(swarm);
+  const polled = swarm.poll()
 
   // Generate a new hypothesis if both agents are active, or both are inactive.
   const newHyp = agent.active === polled.active;
@@ -44,7 +45,7 @@ export const DContextSensitive = (
   agent: Agent,
   swarm: Swarm,
 ): Hyp => {
-  const polled = poll(swarm);
+  const polled = swarm.poll()
   let hyp = agent.hyp;
   if (!agent.active && polled.active) {
     hyp = polled.hyp;

@@ -1,4 +1,6 @@
 import { Microtest } from "../immutable/testing";
+import { Swarm } from "../shared/swarm";
+import { Agent } from "../shared/type";
 
 export const SDSHash = (
   hypCount: number,
@@ -8,7 +10,7 @@ export const SDSHash = (
 
 };
 
-const DPassive = (DH: () => number, agent: Agent, swarm) => {
-
+const DPassive = (DH: () => number, agent: Agent, swarm: Swarm) => {
+  if(agent.active)
 }
 

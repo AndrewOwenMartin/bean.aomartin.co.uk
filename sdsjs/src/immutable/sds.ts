@@ -1,4 +1,5 @@
-import { Agent, Hyp, Swarm } from "../shared/type";
+import { Swarm } from "../shared/swarm";
+import { Agent, Hyp } from "../shared/type";
 import { DHUniform, DPassive } from "./diffusion";
 import { makeHFixed } from "./halting";
 import { ISynchronous } from "./iteration";
@@ -14,7 +15,7 @@ export const SDS: SDSDef = (
   I: (swarm: Swarm) => Swarm,
   H: () => boolean,
   swarm: Swarm,
-) => {
+): Swarm => {
   while (!H()) {
     swarm = I(swarm);
   }
