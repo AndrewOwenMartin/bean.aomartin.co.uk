@@ -53,6 +53,19 @@ See `CONTEXT-MAP.md` for domain context per package. Key points:
 
 **bean content** — pages are MDX files (markdown + embedded React components). Animations are separate purpose-built components; global behaviour uses line charts, individual behaviour shows agents as visible entities. The library has no animation-specific design — animations call library functions directly.
 
+## Coding conventions
+
+**No string constants** — TypeScript's type system is strong enough. Use string literal union types instead of named string constants:
+
+```ts
+// bad
+const FOO = 'foo';
+const BAR = 'bar';
+
+// good
+type Value = 'foo' | 'bar';
+```
+
 ## Agent skills
 
 ### Issue tracker
