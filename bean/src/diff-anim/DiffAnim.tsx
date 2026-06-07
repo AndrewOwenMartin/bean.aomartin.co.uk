@@ -366,12 +366,14 @@ const DiffAnimView = (props: ReturnType<typeof useDiffAnim>) => {
                 strokeDasharray="5 3"
               />
               {agents.map((agent, i) => (
-                <>
+                <g
+                  key={i}
+                  className="diff-anim-agent"
+                  style={{ transform: `translate(${positions[i]!.x}px, ${positions[i]!.y}px)` }}
+                >
                   <circle
-                    key={i}
-                    className="diff-anim-agent"
-                    cx={positions[i]!.x}
-                    cy={positions[i]!.y}
+                    cx={0}
+                    cy={0}
                     r={R}
                     fill={agent.active ? "#22c55e" : "#94a3b8"}
                     stroke={
@@ -382,14 +384,17 @@ const DiffAnimView = (props: ReturnType<typeof useDiffAnim>) => {
                           : "none"
                     }
                     strokeWidth={3}
-                  >
-                  </circle>
+                  />
                   <text
-                    className="diff-anim-agent"
-                    x={positions[i]!.x-(R/2)}
-                    y={positions[i]!.y+(R/2)}
-                  >{i+1}</text>
-                </>
+                    x={0}
+                    y={0}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontSize={11}
+                    fill="#fff"
+                    style={{ userSelect: "none" }}
+                  >{i + 1}</text>
+                </g>
               ))}
             </svg>
           </div>

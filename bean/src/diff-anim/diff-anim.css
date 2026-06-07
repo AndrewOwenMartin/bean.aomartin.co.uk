@@ -61,7 +61,7 @@
 }
 
 .diff-anim-agent {
-  transition: cx 0.35s ease, cy 0.35s ease;
+  transition: transform 0.35s ease;
 }
 
 .diff-anim-active-line {
