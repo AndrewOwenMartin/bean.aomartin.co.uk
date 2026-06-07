@@ -1,6 +1,6 @@
 .diff-anim {
-  max-width: 860px;
   margin: 2em 0;
+
 }
 
 .diff-anim-controls {
@@ -24,13 +24,13 @@
 
 .diff-anim-panels {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5em;
   align-items: flex-start;
 }
 
 .diff-anim-code {
-  flex: 1;
-  min-width: 0;
+  width: 26em;
 }
 
 .diff-anim-code pre {
@@ -42,11 +42,9 @@
 }
 
 .diff-anim-swarm {
-  flex: 1;
-  min-width: 0;
-  display: flex;
   justify-content: center;
   align-items: flex-start;
+  width: 26em;
 }
 
 .diff-anim-svg {

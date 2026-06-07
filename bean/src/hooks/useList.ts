@@ -12,6 +12,11 @@ export type ListAction<StateType, ItemAction> =
       item: StateType;
     }
   | {
+      type: 'insertItem';
+      item: StateType;
+      index: number;
+    }
+  | {
       index?: number;
       type: 'remove';
     }
@@ -54,8 +59,14 @@ export function listReducer<StateType, InnerActionType>(
         action.itemReducer(state[action.index], action.action),
         ...state.slice(action.index + 1),
       ];
+    case 'insertItem':
+      return [
+        ...state.slice(0, action.index),
+        action.item,
+        ...state.slice(action.index),
+      ];
     case 'append':
-      return [...state, action.item];
+      return listReducer(state, {'type': 'insertItem', item: action.item, index: state.length-1})
     case 'remove': {
       const index = action.index || 0;
       return [...state.slice(0, index), ...state.slice(index + 1)];
