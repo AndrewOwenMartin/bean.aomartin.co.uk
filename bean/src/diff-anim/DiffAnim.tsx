@@ -369,7 +369,9 @@ const DiffAnimView = (props: ReturnType<typeof useDiffAnim>) => {
                 <g
                   key={i}
                   className="diff-anim-agent"
-                  style={{ transform: `translate(${positions[i]!.x}px, ${positions[i]!.y}px)` }}
+                  style={{
+                    transform: `translate(${positions[i]!.x}px, ${positions[i]!.y}px)`,
+                  }}
                 >
                   <circle
                     cx={0}
@@ -393,7 +395,9 @@ const DiffAnimView = (props: ReturnType<typeof useDiffAnim>) => {
                     fontSize={11}
                     fill="#fff"
                     style={{ userSelect: "none" }}
-                  >{i + 1}</text>
+                  >
+                    {i + 1}
+                  </text>
                 </g>
               ))}
             </svg>

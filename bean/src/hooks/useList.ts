@@ -1,113 +1,117 @@
-import React from 'react';
+import React from "react";
 
 export type ListAction<StateType, ItemAction> =
   | {
       index: number;
       action: ItemAction;
-      type: 'setItem';
+      type: "setItem";
       itemReducer: (state: StateType, action: ItemAction) => StateType;
     }
   | {
-      type: 'append';
+      type: "append";
       item: StateType;
     }
   | {
-      type: 'insertItem';
+      type: "insertItem";
       item: StateType;
       index: number;
     }
   | {
       index?: number;
-      type: 'remove';
+      type: "remove";
     }
   | {
-      type: 'set';
+      type: "set";
       newList: StateType[];
     }
   | {
-      type: 'map';
+      type: "map";
       action: ItemAction;
       itemReducer: (state: StateType, action: ItemAction) => StateType;
     }
   | {
-      type: 'replaceItem';
+      type: "replaceItem";
       index: number;
       newValue: StateType;
     }
   | {
-      type: 'toggle';
+      type: "toggle";
       item: StateType;
       match?: (item: StateType) => boolean;
     }
   | {
-      type: 'filter';
+      type: "filter";
       filter: (item: StateType) => boolean;
     }
-  | { type: 'resize'; size: number; filler: StateType }
-  | { type: 'fill'; fillValue: StateType };
+  | { type: "resize"; size: number; filler: StateType }
+  | { type: "fill"; fillValue: StateType };
 
 export function listReducer<StateType, InnerActionType>(
   state: StateType[],
   action: ListAction<StateType, InnerActionType>,
 ) {
   switch (action.type) {
-    case 'set':
+    case "set":
       return action.newList;
-    case 'setItem':
+    case "setItem":
       return [
         ...state.slice(0, action.index),
         action.itemReducer(state[action.index], action.action),
         ...state.slice(action.index + 1),
       ];
-    case 'insertItem':
+    case "insertItem":
       return [
         ...state.slice(0, action.index),
         action.item,
         ...state.slice(action.index),
       ];
-    case 'append':
-      return listReducer(state, {'type': 'insertItem', item: action.item, index: state.length-1})
-    case 'remove': {
+    case "append":
+      return listReducer(state, {
+        type: "insertItem",
+        item: action.item,
+        index: state.length - 1,
+      });
+    case "remove": {
       const index = action.index || 0;
       return [...state.slice(0, index), ...state.slice(index + 1)];
     }
-    case 'map':
+    case "map":
       // apply an action to all items in the list.
       return state.map((item) => action.itemReducer(item, action.action));
-    case 'replaceItem':
+    case "replaceItem":
       return [
         ...state.slice(0, action.index),
         action.newValue,
         ...state.slice(action.index + 1),
       ];
-    case 'toggle': {
+    case "toggle": {
       const itemIndex = action.match
         ? state.findIndex(action.match)
         : state.indexOf(action.item);
       if (itemIndex === -1) {
-        return listReducer(state, { type: 'append', item: action.item });
+        return listReducer(state, { type: "append", item: action.item });
       } else {
-        return listReducer(state, { type: 'remove', index: itemIndex });
+        return listReducer(state, { type: "remove", index: itemIndex });
       }
     }
-    case 'filter': {
+    case "filter": {
       return state.filter(action.filter);
     }
-    case 'resize': {
+    case "resize": {
       const resized = Array(action.size).fill(action.filler);
       state.forEach((item, index) => {
         resized[index] = item;
       });
       return resized;
     }
-    case 'fill': {
+    case "fill": {
       return Array(state.length).fill(action.fillValue);
     }
   }
 }
 
 export interface ToggleResult {
-  action: 'added' | 'removed';
+  action: "added" | "removed";
   newLength: number;
 }
 
@@ -145,22 +149,22 @@ export function useList<T>(initList: T[] | (() => T[])): ListHook<T> {
 
   const toggleItem = (item: T, match?: (a: T) => boolean): ToggleResult => {
     const prevLength = value.length;
-    const newValue = listReducer(value, { type: 'toggle', item, match });
+    const newValue = listReducer(value, { type: "toggle", item, match });
     const newLength = newValue.length;
     set(newValue);
-    return { action: newLength > prevLength ? 'added' : 'removed', newLength };
+    return { action: newLength > prevLength ? "added" : "removed", newLength };
   };
 
   const filter = (filterFunction?: (a: T) => boolean): void => {
-    set(listReducer(value, { type: 'filter', filter: filterFunction }));
+    set(listReducer(value, { type: "filter", filter: filterFunction }));
   };
 
   const resize = (size: number, filler: T): void => {
-    set(listReducer(value, { type: 'resize', size, filler }));
+    set(listReducer(value, { type: "resize", size, filler }));
   };
 
   const fill = (fillValue: T): void => {
-    set(listReducer(value, { type: 'fill', fillValue }));
+    set(listReducer(value, { type: "fill", fillValue }));
   };
 
   return {

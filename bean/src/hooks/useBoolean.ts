@@ -1,20 +1,20 @@
-import React from 'react';
+import React from "react";
 
 export type BooleanAction =
-  | { type: 'toggle' }
-  | { type: 'set'; value: boolean }
-  | { type: 'off' }
-  | { type: 'on' };
+  | { type: "toggle" }
+  | { type: "set"; value: boolean }
+  | { type: "off" }
+  | { type: "on" };
 
 export function booleanReducer(value: boolean, action: BooleanAction) {
   switch (action.type) {
-    case 'toggle':
+    case "toggle":
       return !value;
-    case 'set':
+    case "set":
       return action.value;
-    case 'off':
+    case "off":
       return false;
-    case 'on':
+    case "on":
       return true;
   }
 }
@@ -30,10 +30,10 @@ export interface BooleanHook {
 export const useBoolean = (init: boolean) => {
   const [value, dispatch] = React.useReducer(booleanReducer, init);
 
-  const toggle = () => dispatch({ type: 'toggle' });
-  const set = (newValue: boolean) => dispatch({ type: 'set', value: newValue });
-  const off = () => dispatch({ type: 'off' });
-  const on = () => dispatch({ type: 'on' });
+  const toggle = () => dispatch({ type: "toggle" });
+  const set = (newValue: boolean) => dispatch({ type: "set", value: newValue });
+  const off = () => dispatch({ type: "off" });
+  const on = () => dispatch({ type: "on" });
 
   return {
     value,
