@@ -1,0 +1,66 @@
+#### 3.4.3.2 Hypothesis mutation
+
+Uniformly random hypothesis selection has been described as a strength and a weakness
+ofSDSIt is a strength asSDSdoes not require that there is a usable gradient in the objective
+function of the search task, but it is a weakness asSDSis unable to utilise the information
+should one exist [16].
+In this variant, when an agent assumes a hypotheses from another agent, the hypothesis is
+copied with some random perturbation, known as hypothesis transmission noise. This has
+the effect that a form of hill-climbing behaviour emerges in the locality of the transmitted
+hypothesis [16, 76]. This has the advantage of exploiting self-similarity of a search space,
+which is when similarly located hypotheses have similar scores. This can be understood
+intuitively by imagining a cluster near an optimal solution in a continuous search space.
+The time for which agents at the cluster will remain active is a function of the score of that
+hypothesis. Agents which diffuse to the side further away from the optimal will remain
+active for a shorter time, and agents on the side towards the optimal will remain active for
+longer, in this way the cluster will appear to flow towards the optimal until it is centred
+upon it. This mechanism makes it very rare for agents to have identical hypotheses and so
+a cluster must be considered to be a collection of agents with similar hypotheses rather than
+identical hypotheses. The result may be ‘extracted’ by calculating the average hypothesis
+of all active agents. A mode of diffusion utilising hypothesis transmission noise can be
+seen in algorithm 22, it requires an extra parameter ‘noise’ which is a function which takes
+a hypothesis as a parameter and returns a perturbed hypothesis.
+
+There are many functions that could be used to perturb a hypothesis, an example using a
+Gaussian distribution is given in algorithm 22. The amount of noise introduced, by using
+a larger value for sigma in the example using Gaussian distribution, has an effect on the
+speed with which a cluster will appear to move through a search space. The trade-off in
+this context is that a faster moving cluster may miss smaller details of the search space and
+effectively evaluate multiple hypotheses at once, with potentially misleading results. A
+small amount of noise will lead to slower convergence and increases the probability that
+the cluster will not move out of any local optima in the search space, of course a zero or
+
+
+**Algorithm 22** DNOISE— Noisy diffusion and Gaussian noise
+1: **function** DNOISE(DH, noise, swarm)
+2: **function** D’(agent)
+3: **if** agent is inactive **then**
+4: polled←random agent in swarm
+5: **if** polled is active **then**
+6: h←hypothesis of polled
+7: n←noise(h)
+8: hypothesis of agent←n
+9: **else**
+10: hypothesis of agent←DH()
+11: **return** D’
+12: **function** NOISE(hypothesis, sigma)
+13: d←gaussian distribution with standard deviation = sigma
+14: x←random value from d
+15: **return** hypothesis + x
+
+```
+negligable amount of noise is equivalent to standardSDSwhere clusters do not appear to
+move at all. A mechanism has been suggested for estimating a value for the transmission
+error online from the standard deviation of the test scores of an “elite sample” of the best
+scoring agents [75].
+```
+The feature where, in the case of a large amount of noise, a cluster may effectively evaluate
+multiple solutions may be an advantage or disadvantage depending on the context. For
+some tasks it may be useful information that a certain area of the search space contains
+many high scoring hypotheses, whereas in other tasks it may be essential that a single
+hypothesis is evaluated in isolation. For example, consider the following variant ofSDS. In
+a search space with a wide ‘spike’ of high scoring hypotheses around one area, and a much
+thinner and slightly taller ‘spike’ in another area this variant ofSDSwould consistently
+converge to the hypothesis representing the peak of the wider spike if the value for noise
+was above a certain value and would consistently converge to the hypothesis representing
+the peak of the thinner spike if the value for noise was lower than a certain value.
