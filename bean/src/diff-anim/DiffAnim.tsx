@@ -65,7 +65,7 @@ function useDiffAnim() {
   const agent = agents[currentAgent]!;
   const polledAgent = agents[polledIndex]!;
 
-  const step = () => {
+  const step = React.useCallback(() => {
     let next = currentStep;
     if (currentStep === "nextAgent") {
       next = "checkActive";
@@ -95,7 +95,7 @@ function useDiffAnim() {
     if (currentStep === "nextAgent") {
       setCurrentAgent((ca) => (ca + 1) % AGENT_COUNT);
     }
-  };
+  }, [currentStep, agent, polledAgent, currentAgent]);
 
   React.useEffect(() => {
     if (isPlaying) {
@@ -199,7 +199,7 @@ export const DiffAnim = () => {
               stroke="#f59e0b"
               strokeWidth={2}
               strokeDasharray="5 3"
-              style={{ opacity: showConnector ? 1 : 0, transition: "opacity 0.2s ease" }}
+              style={{ opacity: showConnector ? 1 : 0, transition: "opacity 0.2s ease, x1 0.35s ease, y1 0.35s ease, x2 0.35s ease, y2 0.35s ease" }}
             />
             {agents.map((agent, i) => (
               <circle
@@ -216,6 +216,7 @@ export const DiffAnim = () => {
                       : "none"
                 }
                 strokeWidth={3}
+                style={{ transition: "cx 0.35s ease, cy 0.35s ease" }}
               />
             ))}
           </svg>

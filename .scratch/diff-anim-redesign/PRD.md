@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: done
 
 # PRD: Redesign DiffAnim — two-panel diffusion phase animation
 
@@ -62,6 +62,23 @@ Five agents. Five hypothesis positions (segments of the horizontal line). This i
 ## Testing Decisions
 
 Visual verification in the browser. `npm run build` must pass. The animation should run, pause, step, and reset correctly. Convergence (agents clustering at one hypothesis) should be visually obvious after several seconds of auto-play.
+
+## Implementation Record
+
+### Deviations from plan
+- `hypCount` was 10 in the old component; changed to 5 to match the 5 SVG histogram slots. The PRD specified 5 hypothesis positions — this was just a forgotten constant in the original code.
+- `step` was wrapped in `React.useCallback([currentStep, agent, polledAgent, currentAgent])` to satisfy the React Compiler's lint rule about `useEffect` dependencies changing on every render. The PRD didn't mention this but it's the correct pattern.
+
+### Additions beyond scope
+- **Smooth agent transitions**: CSS transitions on SVG `cx`/`cy` attributes (`transition: "cx 0.35s ease, cy 0.35s ease"`) so agents glide between hypothesis slots and stack positions rather than jumping. All agents in a stack animate simultaneously when one leaves or arrives.
+- **KaTeX code splitting**: `MathComparison.tsx` extracted from `App.tsx` and lazy-loaded via `React.lazy` + `React.Suspense`. Reduces initial bundle from 558 KB (170 KB gzipped) to 293 KB (94 KB gzipped). KaTeX loads as a separate 266 KB chunk. Added as a codebase example of the `React.lazy` + named-export re-wrap pattern.
+
+### Files changed
+- `bean/src/diff-anim/DiffAnim.tsx` — full rewrite
+- `bean/src/diff-anim/diff-anim.css` — full rewrite
+- `bean/src/App.tsx` — removed KaTeX imports, added `React.lazy` for `MathComparison`
+- `bean/src/MathComparison.tsx` — new file, extracted from `App.tsx`
+- `bean/package.json` — added `prism-react-renderer: ^2.4.1`
 
 ## Out of Scope
 
