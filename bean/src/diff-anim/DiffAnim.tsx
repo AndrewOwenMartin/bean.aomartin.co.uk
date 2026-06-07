@@ -9,23 +9,16 @@ interface Agent {
 
 type Step = "nextAgent" | "checkActive" | "pollAgent" | "polledActivity" | "diffuse" | "newHyp";
 
-const NEXT_AGENT: Step = "nextAgent";
-const CHECK_ACTIVE: Step = "checkActive";
-const POLL_AGENT: Step = "pollAgent";
-const POLLED_ACTIVITY: Step = "polledActivity";
-const DIFFUSE: Step = "diffuse";
-const NEW_HYP: Step = "newHyp";
-
 const STEP_LINE: Record<Step, number> = {
-  [NEXT_AGENT]: 0,
-  [CHECK_ACTIVE]: 1,
-  [POLL_AGENT]: 2,
-  [POLLED_ACTIVITY]: 3,
-  [DIFFUSE]: 4,
-  [NEW_HYP]: 6,
+  'nextAgent': 0,
+  'checkActive': 1,
+  'pollAgent' : 2,
+  'polledActivity': 3,
+  'diffuse': 4,
+  'newHyp': 6,
 };
 
-const POLLING_STEPS = new Set<Step>([POLL_AGENT, POLLED_ACTIVITY, DIFFUSE, NEW_HYP]);
+const POLLING_STEPS = new Set<Step>(['pollAgent', 'polledActivity', 'diffuse']);
 
 const AGENT_COUNT = 5;
 const HYP_COUNT = 5;
@@ -78,7 +71,7 @@ type DiffAnimAction =
 const makeInitialState = (): DiffAnimState => ({
   agents: initAgents(),
   currentAgent: 0,
-  currentStep: CHECK_ACTIVE,
+  currentStep: 'checkActive',
   polledIndex: 0,
   isPlaying: true,
 });
@@ -89,32 +82,32 @@ const diffAnimReducer = (state: DiffAnimState, action: DiffAnimAction): DiffAnim
       const { currentStep, currentAgent, agents, polledIndex } = state;
       const agent = agents[currentAgent]!;
       const polledAgent = agents[polledIndex]!;
-      if (currentStep === NEXT_AGENT) {
-        return { ...state, currentStep: CHECK_ACTIVE, currentAgent: (currentAgent + 1) % AGENT_COUNT };
+      if (currentStep === 'nextAgent') {
+        return { ...state, currentStep: 'checkActive', currentAgent: (currentAgent + 1) % AGENT_COUNT };
       }
-      if (currentStep === CHECK_ACTIVE) {
-        if (agent.active) return { ...state, currentStep: NEXT_AGENT };
-        return { ...state, currentStep: POLL_AGENT, polledIndex: randomInt(AGENT_COUNT) };
+      if (currentStep === 'checkActive') {
+        if (agent.active) return { ...state, currentStep: 'nextAgent' };
+        return { ...state, currentStep: 'pollAgent', polledIndex: randomInt(AGENT_COUNT) };
       }
-      if (currentStep === POLL_AGENT) {
-        return { ...state, currentStep: POLLED_ACTIVITY };
+      if (currentStep === 'pollAgent') {
+        return { ...state, currentStep: 'polledActivity' };
       }
-      if (currentStep === POLLED_ACTIVITY) {
+      if (currentStep === 'polledActivity') {
         if (polledAgent.active) {
           return {
             ...state,
-            currentStep: DIFFUSE,
+            currentStep: 'diffuse',
             agents: replaceAt(agents, currentAgent, { ...agent, hyp: polledAgent.hyp }),
           };
         }
         return {
           ...state,
-          currentStep: NEW_HYP,
+          currentStep: 'newHyp',
           agents: replaceAt(agents, currentAgent, { ...agent, hyp: randomInt(HYP_COUNT) }),
         };
       }
-      if (currentStep === DIFFUSE || currentStep === NEW_HYP) {
-        return { ...state, currentStep: NEXT_AGENT };
+      if (currentStep === 'diffuse' || currentStep === 'newHyp') {
+        return { ...state, currentStep: 'nextAgent' };
       }
       return state;
     }
