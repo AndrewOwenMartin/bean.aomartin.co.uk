@@ -26,7 +26,16 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1.5em;
-  align-items: flex-start;
+  align-items: stretch;
+}
+
+.diff-anim-notes {
+  border-radius: 6px;
+  padding: 0.5em;
+  line-height: 1.7;
+  border: 1px solid #e5e7eb;
+  background-color: rgb(246, 248, 250);
+  min-width: 20em;
 }
 
 .diff-anim-code {
@@ -35,6 +44,7 @@
 
 .diff-anim-code pre {
   margin: 0;
+  padding: 0.5em;
   border-radius: 6px;
   font-size: 0.85em;
   line-height: 1.7;
