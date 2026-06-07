@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StoriesRouteImport } from './routes/stories'
+import { Route as HypothesisMutationRouteImport } from './routes/hypothesis-mutation'
 import { Route as FutureWorkRouteImport } from './routes/future-work'
+import { Route as ContextFreeSensitiveRouteImport } from './routes/context-free-sensitive'
 import { Route as IndexRouteImport } from './routes/index'
 
 const StoriesRoute = StoriesRouteImport.update({
@@ -18,9 +20,19 @@ const StoriesRoute = StoriesRouteImport.update({
   path: '/stories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HypothesisMutationRoute = HypothesisMutationRouteImport.update({
+  id: '/hypothesis-mutation',
+  path: '/hypothesis-mutation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FutureWorkRoute = FutureWorkRouteImport.update({
   id: '/future-work',
   path: '/future-work',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContextFreeSensitiveRoute = ContextFreeSensitiveRouteImport.update({
+  id: '/context-free-sensitive',
+  path: '/context-free-sensitive',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,31 +43,55 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/context-free-sensitive': typeof ContextFreeSensitiveRoute
   '/future-work': typeof FutureWorkRoute
+  '/hypothesis-mutation': typeof HypothesisMutationRoute
   '/stories': typeof StoriesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/context-free-sensitive': typeof ContextFreeSensitiveRoute
   '/future-work': typeof FutureWorkRoute
+  '/hypothesis-mutation': typeof HypothesisMutationRoute
   '/stories': typeof StoriesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/context-free-sensitive': typeof ContextFreeSensitiveRoute
   '/future-work': typeof FutureWorkRoute
+  '/hypothesis-mutation': typeof HypothesisMutationRoute
   '/stories': typeof StoriesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/future-work' | '/stories'
+  fullPaths:
+    | '/'
+    | '/context-free-sensitive'
+    | '/future-work'
+    | '/hypothesis-mutation'
+    | '/stories'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/future-work' | '/stories'
-  id: '__root__' | '/' | '/future-work' | '/stories'
+  to:
+    | '/'
+    | '/context-free-sensitive'
+    | '/future-work'
+    | '/hypothesis-mutation'
+    | '/stories'
+  id:
+    | '__root__'
+    | '/'
+    | '/context-free-sensitive'
+    | '/future-work'
+    | '/hypothesis-mutation'
+    | '/stories'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContextFreeSensitiveRoute: typeof ContextFreeSensitiveRoute
   FutureWorkRoute: typeof FutureWorkRoute
+  HypothesisMutationRoute: typeof HypothesisMutationRoute
   StoriesRoute: typeof StoriesRoute
 }
 
@@ -68,11 +104,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hypothesis-mutation': {
+      id: '/hypothesis-mutation'
+      path: '/hypothesis-mutation'
+      fullPath: '/hypothesis-mutation'
+      preLoaderRoute: typeof HypothesisMutationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/future-work': {
       id: '/future-work'
       path: '/future-work'
       fullPath: '/future-work'
       preLoaderRoute: typeof FutureWorkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/context-free-sensitive': {
+      id: '/context-free-sensitive'
+      path: '/context-free-sensitive'
+      fullPath: '/context-free-sensitive'
+      preLoaderRoute: typeof ContextFreeSensitiveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,7 +137,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContextFreeSensitiveRoute: ContextFreeSensitiveRoute,
   FutureWorkRoute: FutureWorkRoute,
+  HypothesisMutationRoute: HypothesisMutationRoute,
   StoriesRoute: StoriesRoute,
 }
 export const routeTree = rootRouteImport
