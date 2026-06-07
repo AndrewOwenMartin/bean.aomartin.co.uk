@@ -48,3 +48,24 @@
   justify-content: center;
   align-items: flex-start;
 }
+
+.diff-anim-svg {
+  display: block;
+}
+
+.diff-anim-connector {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.diff-anim-connector.visible {
+  opacity: 1;
+}
+
+.diff-anim-agent {
+  transition: cx 0.35s ease, cy 0.35s ease;
+}
+
+.diff-anim-active-line {
+  background: #fef9c3;
+}

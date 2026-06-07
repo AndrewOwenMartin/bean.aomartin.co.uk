@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: done
 
 # PRD: Migrate bean from runtime markdown to MDX
 

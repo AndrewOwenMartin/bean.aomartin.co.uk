@@ -7,19 +7,28 @@ interface Agent {
   hyp: number;
 }
 
+type Step = "nextAgent" | "checkActive" | "pollAgent" | "polledActivity" | "diffuse" | "newHyp";
+
+const NEXT_AGENT: Step = "nextAgent";
+const CHECK_ACTIVE: Step = "checkActive";
+const POLL_AGENT: Step = "pollAgent";
+const POLLED_ACTIVITY: Step = "polledActivity";
+const DIFFUSE: Step = "diffuse";
+const NEW_HYP: Step = "newHyp";
+
+const STEP_LINE: Record<Step, number> = {
+  [NEXT_AGENT]: 0,
+  [CHECK_ACTIVE]: 1,
+  [POLL_AGENT]: 2,
+  [POLLED_ACTIVITY]: 3,
+  [DIFFUSE]: 4,
+  [NEW_HYP]: 6,
+};
+
+const POLLING_STEPS = new Set<Step>([POLL_AGENT, POLLED_ACTIVITY, DIFFUSE, NEW_HYP]);
+
 const AGENT_COUNT = 5;
 const HYP_COUNT = 5;
-const STEPS = ["nextAgent", "checkActive", "pollAgent", "polledActivity", "diffuse", "newHyp"];
-const STEP_LINE: Record<string, number> = {
-  nextAgent: 0,
-  checkActive: 1,
-  pollAgent: 2,
-  polledActivity: 3,
-  diffuse: 4,
-  newHyp: 6,
-};
-const POLLING_STEPS = new Set(["pollAgent", "polledActivity", "diffuse", "newHyp"]);
-
 const SVG_W = 400;
 const SVG_H = 200;
 const PAD = 40;
@@ -39,12 +48,12 @@ const PYTHON_CODE = `for agent in agents:
         else:
             agent.hyp = random.choice(hypotheses)`;
 
-const ri = (n: number) => Math.floor(Math.random() * n);
+const randomInt = (count: number) => Math.floor(Math.random() * count);
 
 const initAgents = (): Agent[] =>
   Array.from({ length: AGENT_COUNT }, () => ({
     active: Math.random() > 0.5,
-    hyp: ri(HYP_COUNT),
+    hyp: randomInt(HYP_COUNT),
   }));
 
 const replaceAt = <T,>(arr: T[], i: number, v: T): T[] => [
@@ -53,97 +62,119 @@ const replaceAt = <T,>(arr: T[], i: number, v: T): T[] => [
   ...arr.slice(i + 1),
 ];
 
-function useDiffAnim() {
-  const [agents, setAgents] = React.useState<Agent[]>(initAgents);
-  const [currentAgent, setCurrentAgent] = React.useState(0);
-  const [stepIdx, setStepIdx] = React.useState(1);
-  const [polledIndex, setPolledIndex] = React.useState(0);
-  const [isPlaying, setIsPlaying] = React.useState(true);
-  const timerRef = React.useRef<ReturnType<typeof setInterval>>(undefined);
-
-  const currentStep = STEPS[stepIdx]!;
-  const agent = agents[currentAgent]!;
-  const polledAgent = agents[polledIndex]!;
-
-  const step = React.useCallback(() => {
-    let next = currentStep;
-    if (currentStep === "nextAgent") {
-      next = "checkActive";
-    } else if (currentStep === "checkActive") {
-      if (agent.active) {
-        next = "nextAgent";
-      } else {
-        next = "pollAgent";
-        setPolledIndex(ri(AGENT_COUNT));
-      }
-    } else if (currentStep === "pollAgent") {
-      next = "polledActivity";
-    } else if (currentStep === "polledActivity") {
-      const updated = { ...agent };
-      if (polledAgent.active) {
-        updated.hyp = polledAgent.hyp;
-        next = "diffuse";
-      } else {
-        updated.hyp = ri(HYP_COUNT);
-        next = "newHyp";
-      }
-      setAgents((prev) => replaceAt(prev, currentAgent, updated));
-    } else if (currentStep === "diffuse" || currentStep === "newHyp") {
-      next = "nextAgent";
-    }
-    setStepIdx(STEPS.indexOf(next));
-    if (currentStep === "nextAgent") {
-      setCurrentAgent((ca) => (ca + 1) % AGENT_COUNT);
-    }
-  }, [currentStep, agent, polledAgent, currentAgent]);
-
-  React.useEffect(() => {
-    if (isPlaying) {
-      timerRef.current = setInterval(step, 800);
-    }
-    return () => clearInterval(timerRef.current);
-  }, [step, isPlaying]);
-
-  const reset = () => {
-    clearInterval(timerRef.current);
-    setAgents(initAgents());
-    setCurrentAgent(0);
-    setStepIdx(1);
-    setPolledIndex(0);
-    setIsPlaying(false);
-  };
-
-  return { agents, currentAgent, currentStep, polledIndex, isPlaying, setIsPlaying, step, reset };
+interface DiffAnimState {
+  agents: Agent[];
+  currentAgent: number;
+  currentStep: Step;
+  polledIndex: number;
+  isPlaying: boolean;
 }
+
+type DiffAnimAction =
+  | { type: "STEP" }
+  | { type: "TOGGLE_PLAY" }
+  | { type: "RESET" };
+
+const makeInitialState = (): DiffAnimState => ({
+  agents: initAgents(),
+  currentAgent: 0,
+  currentStep: CHECK_ACTIVE,
+  polledIndex: 0,
+  isPlaying: true,
+});
+
+const diffAnimReducer = (state: DiffAnimState, action: DiffAnimAction): DiffAnimState => {
+  switch (action.type) {
+    case "STEP": {
+      const { currentStep, currentAgent, agents, polledIndex } = state;
+      const agent = agents[currentAgent]!;
+      const polledAgent = agents[polledIndex]!;
+      if (currentStep === NEXT_AGENT) {
+        return { ...state, currentStep: CHECK_ACTIVE, currentAgent: (currentAgent + 1) % AGENT_COUNT };
+      }
+      if (currentStep === CHECK_ACTIVE) {
+        if (agent.active) return { ...state, currentStep: NEXT_AGENT };
+        return { ...state, currentStep: POLL_AGENT, polledIndex: randomInt(AGENT_COUNT) };
+      }
+      if (currentStep === POLL_AGENT) {
+        return { ...state, currentStep: POLLED_ACTIVITY };
+      }
+      if (currentStep === POLLED_ACTIVITY) {
+        if (polledAgent.active) {
+          return {
+            ...state,
+            currentStep: DIFFUSE,
+            agents: replaceAt(agents, currentAgent, { ...agent, hyp: polledAgent.hyp }),
+          };
+        }
+        return {
+          ...state,
+          currentStep: NEW_HYP,
+          agents: replaceAt(agents, currentAgent, { ...agent, hyp: randomInt(HYP_COUNT) }),
+        };
+      }
+      if (currentStep === DIFFUSE || currentStep === NEW_HYP) {
+        return { ...state, currentStep: NEXT_AGENT };
+      }
+      return state;
+    }
+    case "TOGGLE_PLAY":
+      return { ...state, isPlaying: !state.isPlaying };
+    case "RESET":
+      return { ...makeInitialState(), isPlaying: false };
+  }
+};
 
 interface AgentPos {
   x: number;
   y: number;
 }
 
-function computePositions(agents: Agent[]): AgentPos[] {
+const computePositions = (agents: Agent[]): AgentPos[] => {
   const stacks: number[][] = Array.from({ length: HYP_COUNT }, () => []);
   agents.forEach((a, i) => stacks[a.hyp]!.push(i));
   return agents.map((a, i) => ({
     x: SLOT_X[a.hyp]!,
     y: BASELINE_Y - R - stacks[a.hyp]!.indexOf(i) * STACK_GAP,
   }));
-}
+};
 
-export const DiffAnim = () => {
-  const { agents, currentAgent, currentStep, polledIndex, isPlaying, setIsPlaying, step, reset } =
-    useDiffAnim();
+const useDiffAnim = () => {
+  const [state, dispatch] = React.useReducer(diffAnimReducer, undefined, makeInitialState);
+  const timerRef = React.useRef<ReturnType<typeof setInterval>>(undefined);
+
+  const step = React.useCallback(() => dispatch({ type: "STEP" }), []);
+
+  React.useEffect(() => {
+    if (state.isPlaying) {
+      timerRef.current = setInterval(step, 800);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [step, state.isPlaying]);
+
+  const togglePlay = () => dispatch({ type: "TOGGLE_PLAY" });
+  const reset = () => {
+    clearInterval(timerRef.current);
+    dispatch({ type: "RESET" });
+  };
+
+  const { agents, currentAgent, polledIndex, isPlaying, currentStep } = state;
   const positions = computePositions(agents);
-  const activeLine = STEP_LINE[currentStep]!;
+  const activeLine = STEP_LINE[currentStep];
   const showConnector = POLLING_STEPS.has(currentStep);
 
+  return { agents, currentAgent, polledIndex, isPlaying, positions, activeLine, showConnector, togglePlay, step, reset };
+};
+
+const DiffAnimView = (props: ReturnType<typeof useDiffAnim>) => {
+  const { agents, currentAgent, polledIndex, isPlaying, positions, activeLine, showConnector, togglePlay, step, reset } = props;
   const curPos = positions[currentAgent]!;
   const pollPos = positions[polledIndex]!;
 
   return (
     <div className="diff-anim">
       <div className="diff-anim-controls">
-        <button onClick={() => setIsPlaying((p) => !p)}>{isPlaying ? "Pause" : "Play"}</button>
+        <button onClick={togglePlay}>{isPlaying ? "Pause" : "Play"}</button>
         <button onClick={step}>Step</button>
         <button onClick={reset}>Reset</button>
       </div>
@@ -158,10 +189,7 @@ export const DiffAnim = () => {
                     <div
                       key={i}
                       {...lp}
-                      style={{
-                        ...lp.style,
-                        ...(i === activeLine ? { background: "#fef9c3" } : {}),
-                      }}
+                      className={[lp.className, i === activeLine ? "diff-anim-active-line" : ""].filter(Boolean).join(" ")}
                     >
                       {line.map((token, key) => (
                         <span key={key} {...getTokenProps({ token })} />
@@ -174,7 +202,7 @@ export const DiffAnim = () => {
           </Highlight>
         </div>
         <div className="diff-anim-swarm">
-          <svg width={SVG_W} height={SVG_H} style={{ display: "block" }}>
+          <svg className="diff-anim-svg" width={SVG_W} height={SVG_H}>
             <line
               x1={PAD - 10}
               y1={BASELINE_Y}
@@ -192,6 +220,7 @@ export const DiffAnim = () => {
               </g>
             ))}
             <line
+              className={`diff-anim-connector${showConnector ? " visible" : ""}`}
               x1={curPos.x}
               y1={curPos.y}
               x2={pollPos.x}
@@ -199,11 +228,11 @@ export const DiffAnim = () => {
               stroke="#f59e0b"
               strokeWidth={2}
               strokeDasharray="5 3"
-              style={{ opacity: showConnector ? 1 : 0, transition: "opacity 0.2s ease, x1 0.35s ease, y1 0.35s ease, x2 0.35s ease, y2 0.35s ease" }}
             />
             {agents.map((agent, i) => (
               <circle
                 key={i}
+                className="diff-anim-agent"
                 cx={positions[i]!.x}
                 cy={positions[i]!.y}
                 r={R}
@@ -216,7 +245,6 @@ export const DiffAnim = () => {
                       : "none"
                 }
                 strokeWidth={3}
-                style={{ transition: "cx 0.35s ease, cy 0.35s ease" }}
               />
             ))}
           </svg>
@@ -225,3 +253,5 @@ export const DiffAnim = () => {
     </div>
   );
 };
+
+export const DiffAnim = () => <DiffAnimView {...useDiffAnim()} />;
