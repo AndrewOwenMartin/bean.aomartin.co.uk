@@ -7,6 +7,10 @@ export interface Swarm {
   agentCount: number;
   poll: () => Agent;
   forAll: (f: (agent: Agent) => Agent) => Swarm;
+  iter: () => Iterable<Agent>;
+  replace: (old: Agent, next: Agent) => Swarm;
+  getClusters: (maxClusters: number, minClusterSize: number) => Map<Hyp, number>;
+  getActivity: () => number;
   // type: SwarmType
 }
 
@@ -30,6 +34,22 @@ const makeArraySwarm = (agents: Agent[]): ArraySwarm => ({
   agentCount: agents.length,
   poll: () => poll(agents),
   forAll: (f) => makeArraySwarm(agents.map(f)),
+  iter: () => agents,
+  replace: (old, next) => makeArraySwarm(agents.map(a => a === old ? next : a)),
+  getClusters: (maxClusters, minClusterSize) => {
+    const counts = new Map<Hyp, number>();
+    for (const agent of agents) {
+      if (agent.active) {
+        counts.set(agent.hyp, (counts.get(agent.hyp) ?? 0) + 1);
+      }
+    }
+    const sorted = [...counts.entries()]
+      .filter(([, n]) => n >= minClusterSize)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, maxClusters);
+    return new Map(sorted);
+  },
+  getActivity: () => agents.filter(a => a.active).length / agents.length,
 });
 
 export const initArraySwarm = (agentCount: number): ArraySwarm =>
@@ -41,6 +61,10 @@ export const initHashSwarm = (agentCount: number): Swarm => {
     agentCount,
     poll: () => hashPoll(agents, agentCount),
     forAll: () => { throw new Error("HashSwarm.forAll not yet implemented"); },
+    iter: () => { throw new Error("HashSwarm.iter not yet implemented"); },
+    replace: () => { throw new Error("HashSwarm.replace not yet implemented"); },
+    getClusters: () => { throw new Error("HashSwarm.getClusters not yet implemented"); },
+    getActivity: () => { throw new Error("HashSwarm.getActivity not yet implemented"); },
     // type: 'hashSwarm',
   };
 }
@@ -57,4 +81,3 @@ export const initHashSwarm = (agentCount: number): Swarm => {
 //     poll,
 //   }
 // }
-

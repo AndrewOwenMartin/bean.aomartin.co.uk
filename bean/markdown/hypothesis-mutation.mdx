@@ -1,66 +1,172 @@
-#### 3.4.3.2 Hypothesis mutation
+# Hypothesis mutation
 
-Uniformly random hypothesis selection has been described as a strength and a weakness
-ofSDSIt is a strength asSDSdoes not require that there is a usable gradient in the objective
-function of the search task, but it is a weakness asSDSis unable to utilise the information
-should one exist [16].
-In this variant, when an agent assumes a hypotheses from another agent, the hypothesis is
-copied with some random perturbation, known as hypothesis transmission noise. This has
-the effect that a form of hill-climbing behaviour emerges in the locality of the transmitted
-hypothesis [16, 76]. This has the advantage of exploiting self-similarity of a search space,
-which is when similarly located hypotheses have similar scores. This can be understood
-intuitively by imagining a cluster near an optimal solution in a continuous search space.
-The time for which agents at the cluster will remain active is a function of the score of that
-hypothesis. Agents which diffuse to the side further away from the optimal will remain
-active for a shorter time, and agents on the side towards the optimal will remain active for
-longer, in this way the cluster will appear to flow towards the optimal until it is centred
-upon it. This mechanism makes it very rare for agents to have identical hypotheses and so
-a cluster must be considered to be a collection of agents with similar hypotheses rather than
-identical hypotheses. The result may be ‘extracted’ by calculating the average hypothesis
-of all active agents. A mode of diffusion utilising hypothesis transmission noise can be
-seen in algorithm 22, it requires an extra parameter ‘noise’ which is a function which takes
-a hypothesis as a parameter and returns a perturbed hypothesis.
+## Standard SDS is gradient-free by design
 
-There are many functions that could be used to perturb a hypothesis, an example using a
-Gaussian distribution is given in algorithm 22. The amount of noise introduced, by using
-a larger value for sigma in the example using Gaussian distribution, has an effect on the
-speed with which a cluster will appear to move through a search space. The trade-off in
-this context is that a faster moving cluster may miss smaller details of the search space and
-effectively evaluate multiple hypotheses at once, with potentially misleading results. A
-small amount of noise will lead to slower convergence and increases the probability that
-the cluster will not move out of any local optima in the search space, of course a zero or
+When an inactive agent in standard SDS fails to recruit from a polled agent, it calls
+`DH()` — jumping to a uniformly random hypothesis. When it does recruit, it copies the
+active agent's hypothesis exactly. Neither case uses any information about *how good*
+nearby hypotheses are.
 
+This is a deliberate choice. SDS works without needing a gradient in the objective
+function. You don't need to know that hypothesis 42 scores slightly better than
+hypothesis 41. The test phase only asks: does this hypothesis pass? That simplicity is
+what makes SDS applicable to search spaces where gradients are unavailable or
+meaningless.
 
-**Algorithm 22** DNOISE— Noisy diffusion and Gaussian noise
-1: **function** DNOISE(DH, noise, swarm)
-2: **function** D’(agent)
-3: **if** agent is inactive **then**
-4: polled←random agent in swarm
-5: **if** polled is active **then**
-6: h←hypothesis of polled
-7: n←noise(h)
-8: hypothesis of agent←n
-9: **else**
-10: hypothesis of agent←DH()
-11: **return** D’
-12: **function** NOISE(hypothesis, sigma)
-13: d←gaussian distribution with standard deviation = sigma
-14: x←random value from d
-15: **return** hypothesis + x
+But for search spaces that *do* have structure — where similar hypotheses tend to score
+similarly — this is leaving information on the table. If an agent is sitting on hypothesis
+41 and passing its test, there is reason to suspect that hypothesis 42 might also pass.
+Standard SDS never acts on that suspicion.
+
+## Hypothesis transmission noise
+
+The noisy diffusion variant makes one small change to the copy step: instead of taking
+the active agent's hypothesis exactly, the recruiting agent applies a perturbation to it.
 
 ```
-negligable amount of noise is equivalent to standardSDSwhere clusters do not appear to
-move at all. A mechanism has been suggested for estimating a value for the transmission
-error online from the standard deviation of the test scores of an “elite sample” of the best
-scoring agents [75].
+DNOISE(agent, swarm):
+  polled ← random agent in swarm
+
+  if agent is inactive and polled is active:
+    hypothesis of agent ← noise(hypothesis of polled)
+
+  else if agent is inactive:
+    hypothesis of agent ← DH()
 ```
-The feature where, in the case of a large amount of noise, a cluster may effectively evaluate
-multiple solutions may be an advantage or disadvantage depending on the context. For
-some tasks it may be useful information that a certain area of the search space contains
-many high scoring hypotheses, whereas in other tasks it may be essential that a single
-hypothesis is evaluated in isolation. For example, consider the following variant ofSDS. In
-a search space with a wide ‘spike’ of high scoring hypotheses around one area, and a much
-thinner and slightly taller ‘spike’ in another area this variant ofSDSwould consistently
-converge to the hypothesis representing the peak of the wider spike if the value for noise
-was above a certain value and would consistently converge to the hypothesis representing
-the peak of the thinner spike if the value for noise was lower than a certain value.
+
+The `noise` function takes a hypothesis and returns a nearby one. For a continuous
+one-dimensional search space, this might be adding a value drawn from a Gaussian
+distribution with mean zero. The key property is that the result stays *close* to the
+input — the perturbed hypothesis is a neighbour of the original, not a random jump.
+
+## The cluster flows
+
+This small change has a large emergent effect. Consider a cluster that has formed near
+(but not exactly at) an optimal hypothesis. Some agents in the cluster are slightly to the
+left of the optimum; some are slightly to the right.
+
+The test phase does not treat these identically. Agents whose hypothesis is closer to the
+optimum are more likely to pass. Agents further away are more likely to fail and become
+inactive. Now, during diffusion, those inactive agents poll the cluster. They are more
+likely to poll agents whose hypothesis is closer to the optimum — because those agents
+have been active longer and are more likely to be there when sampled.
+
+The result: the hypothesis transmitted to the recruits is, on average, biased toward the
+better end of the cluster. Add noise, and the recruit's hypothesis is centred on that
+slightly-better point. The cluster's centre of mass drifts toward the optimum. This is
+hill-climbing, emerging from the interaction of biased recruitment and perturbation —
+not from any explicit gradient calculation.
+
+## The cluster is now a distribution
+
+With standard SDS, every agent in a cluster sits on the same hypothesis. You can detect
+the cluster by counting how many agents share a hypothesis, and read off the answer
+directly.
+
+With noisy diffusion, agents in a cluster will rarely share the exact same hypothesis.
+The cluster is now a *distribution* of nearby hypotheses — a cloud around the optimum
+rather than a point at it. Two consequences follow.
+
+**Cluster detection changes.** You cannot count identical hypotheses. Instead, you need
+a notion of proximity: agents are in the same cluster if their hypotheses are within some
+distance of each other. The right distance threshold is task-specific — it depends on
+the noise function and the resolution of the search space.
+
+**Reading the answer changes.** The answer is no longer "the hypothesis shared by the
+largest group of agents." It is a summary statistic over the active agents in the cluster.
+For a one-dimensional continuous search space, the mean of active agents' hypotheses is
+the natural choice. For a higher-dimensional or structured search space, you need a
+centre-finding method appropriate to the space — and that method should be designed
+alongside the noise function, since the shape of the cloud depends on how noise is applied.
+
+## The noise size tradeoff
+
+The magnitude of the perturbation controls a tradeoff between exploration and precision.
+
+**Large noise** moves the cluster faster. An agent that recruits from the cluster can land
+far from the current centre. This helps the cluster escape local optima: if there is a
+slightly better region nearby, a large-noise cluster will find it more quickly. The cost
+is that a large-noise cluster is wide — it may simultaneously span two distinct high-scoring
+regions, making it hard to interpret the cluster as pointing at a single answer.
+
+**Small noise** keeps the cluster tight and precise. The answer extracted from the cluster
+centre is more reliable. But a tight cluster converges slowly and is more likely to stay
+trapped near a local optimum, never moving far enough to discover a better region.
+
+**Zero noise** is standard SDS with exact hypothesis copying. The cluster does not move
+at all.
+
+The wide-spike vs. narrow-spike problem illustrates the tradeoff concretely. Suppose
+a search space has two high-scoring regions: one wide and gently-peaked, one narrow and
+sharply-peaked (and slightly higher). With large noise, the cluster tends to converge on
+the wide region — even though it is not the global optimum — because the perturbations
+keep landing in it. With small noise, the cluster finds the narrow peak. The right noise
+size depends on the geometry of the search space, and getting it wrong means finding the
+wrong answer.
+
+## Variants
+
+### Context-sensitive mutation
+
+Standard noisy diffusion applies perturbation only during inactive-agent recruitment —
+the same moment passive diffusion would copy a hypothesis. But consider combining
+hypothesis mutation with context-sensitive diffusion.
+
+In context-sensitive SDS, an active agent that polls another active agent *at the same
+hypothesis* calls `DH()` — it is knocked back to random exploration. The motivation
+there is to cap cluster size. An alternative response to the same event is to apply noise
+instead of calling `DH()`:
+
+```
+DNOISE-SENSITIVE(agent, swarm):
+  polled ← random agent in swarm
+
+  if agent is inactive and polled is active:
+    hypothesis of agent ← noise(hypothesis of polled)
+
+  else if agent is active and polled is active and same hypothesis:
+    hypothesis of agent ← noise(hypothesis of polled)
+
+  else if agent is inactive:
+    hypothesis of agent ← DH()
+```
+
+The effect is different from standard context-sensitive diffusion. Rather than ejecting
+the agent into random exploration on a collision, this variant nudges it to a nearby
+hypothesis. The agent stays close to the cluster. This is a more conservative collision
+response: the cluster still has a size cap (collision pressure still exists), but the
+agent's knowledge of where the cluster is is not completely discarded.
+
+Whether `noise(hypothesis of polled)` or `DH()` is the better collision response is an
+open question. The answer likely depends on whether the search space rewards exploitation
+of nearby hypotheses or requires genuine re-exploration after a collision.
+
+### Probabilistic mutation
+
+A simpler variant sits between noisy and standard diffusion: apply noise with some
+probability, and copy exactly otherwise.
+
+```
+DPROBABILISTIC-NOISE(agent, swarm, p):
+  polled ← random agent in swarm
+
+  if agent is inactive and polled is active:
+    h ← hypothesis of polled
+    hypothesis of agent ← noise(h) if random() < p else h
+
+  else if agent is inactive:
+    hypothesis of agent ← DH()
+```
+
+When `p = 0`, this is standard passive diffusion. When `p = 1`, this is standard noisy
+diffusion. Values in between give a mixed cluster: some agents sit exactly on the
+transmitted hypothesis (forming a detectable sharp core), others drift from it.
+
+The sharp core is detectable by standard methods — count agents sharing a hypothesis.
+The drifting agents around it contribute to hill-climbing without destroying the
+cluster's identifiability. This variant is easier to analyse than full noisy diffusion
+because the cluster has both a well-defined centre (the most common hypothesis) and a
+hill-climbing neighbourhood around it.
+
+How `p` should be set, and whether it should be fixed or adapt during the search, is
+an open question.

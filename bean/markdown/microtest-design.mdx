@@ -1,0 +1,115 @@
+# Microtest design
+
+## The test phase in one sentence
+
+Every iteration, each agent evaluates its current hypothesis and becomes active if the
+test passes, inactive if it fails. The test is called a *microtest* — and its only
+hard requirement is that it returns a boolean.
+
+Everything else about how a microtest works is up to you.
+
+## Partial evaluation
+
+The "micro" in microtest reflects a deliberate design choice: each test should only
+examine *part* of the hypothesis. A hypothesis in an image search task might be an
+(x, y) coordinate. Rather than scoring the full image patch at that position, a microtest
+might check a single pixel, or a single feature, or compare one small region against a
+reference.
+
+Partial evaluation is what gives SDS its speed. An agent doesn't need to fully evaluate
+its hypothesis before deciding whether to stay or move — a quick partial check is enough
+to maintain the right statistical pressure on the swarm. Good hypotheses pass partial
+tests more often; bad ones fail more often. The cluster forms around the good ones.
+
+## Stochastic and deterministic tests are equivalent
+
+A microtest does not have to be deterministic. It might pass with some probability that
+depends on how good the hypothesis is — perhaps by randomly sampling one feature from
+a set and checking it, so the pass probability is the fraction of features that the
+hypothesis satisfies.
+
+A stochastic microtest like this is formally equivalent to a set of deterministic
+microtests. Suppose a hypothesis satisfies 7 out of 10 possible features. You could
+implement the test as:
+
+- One stochastic test that randomly picks a feature and checks it (passes with
+  probability 0.7), or
+- Ten deterministic tests (one per feature), with one selected uniformly at random each
+  iteration.
+
+Both implementations produce the same pass probability, and therefore the same behaviour
+at the swarm level. SDS cannot distinguish between them.
+
+This equivalence matters for two reasons.
+
+**Implementation freedom.** You can encode your microtest however is most natural for
+the task. One stochastic test, several smaller deterministic tests, or any combination —
+the swarm sees the same effective probability either way. There is no canonical form.
+
+**Mathematical simplicity.** When analysing SDS formally, you do not need to model the
+internal structure of the microtest at all. A single parameter `p` — the probability
+that the test passes for a given hypothesis — is sufficient to describe the test's
+effect on the swarm. The details of how `p` arises from the hypothesis and the task are
+abstracted away.
+
+## Scalar tests and thresholds
+
+Some natural evaluation functions return a score rather than a boolean — a match
+quality, a distance, a likelihood. The standard approach is to apply a threshold: the
+test passes if the score exceeds some value, fails otherwise. This is equivalent to
+baking the threshold into the test. From the swarm's perspective, only the resulting
+pass probability matters — the raw score is discarded.
+
+Because each test is a partial evaluation, the score from any single iteration carries
+limited information and should not be over-interpreted. The swarm's behaviour emerges
+from many tests over many iterations, not from any individual result.
+
+## Comparative testing
+
+There is one case where the numeric score is used directly: an agent becomes active if
+its test score is *greater than* the score of a randomly chosen agent, rather than
+greater than a fixed threshold.
+
+```
+TCOMPARATIVE(agent, swarm):
+  score ← evaluate(hypothesis of agent)
+  other ← random agent in swarm
+  other_score ← last score of other
+  agent is active ← score > other_score
+```
+
+This variant is self-calibrating — no fixed threshold to set. The effective threshold
+adapts to the current distribution of scores in the swarm. A hypothesis only needs to
+be better than average to survive, so the swarm naturally tracks the best available
+hypotheses rather than those clearing some predetermined bar.
+
+The requirement is that test scores are *directly comparable*: every agent must be
+evaluated by the same function on the same scale, so that comparing two scores is
+meaningful. If different agents run qualitatively different tests, a numerical comparison
+of their scores is not well-defined.
+
+The comparison itself still returns a boolean — an agent is either active or not. But
+this structure opens a question: what if activity were a continuous value, reflecting
+by how much an agent's score exceeded the comparison? Whether continuous activity is a
+coherent generalisation of SDS, and what its convergence properties would be, is an open
+question.
+
+## Designing microtests in practice
+
+A good microtest has three properties:
+
+**It correlates with hypothesis quality.** A partial check should pass more often for
+good hypotheses than bad ones. If the test is uncorrelated with quality — essentially
+random — agents have no reason to cluster anywhere useful.
+
+**It is cheap to compute.** The purpose of partial evaluation is to avoid expensive full
+evaluations. A microtest that scores the entire hypothesis on every iteration is not
+meaningfully partial. The test should examine just enough of the hypothesis to
+discriminate good from bad, and no more.
+
+**Its results are independent across iterations.** If the same check runs every time —
+always the same feature, always the same comparison — the test loses the statistical
+benefit of sampling. An agent at a mediocre hypothesis that happens to pass the fixed
+check will stay active indefinitely. Randomising which part of the hypothesis is checked
+each iteration ensures that pass probability tracks quality over time, not luck of the
+draw on the first test.
