@@ -1,4 +1,4 @@
-import { Swarm } from "../shared/swarm";
+import { Swarm } from "./swarm";
 import { Diffusion } from "./diffusion";
 import { TBoolean, TestSelector, Testing } from "./testing";
 

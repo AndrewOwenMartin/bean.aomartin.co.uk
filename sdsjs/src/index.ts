@@ -38,6 +38,6 @@ export {
 } from "./immutable/halting";
 export type { HaltingFn } from "./immutable/halting";
 export { ISynchronous, IAsynchronous, IActive } from "./immutable/iteration";
-export { initArraySwarm } from "./shared/swarm";
-export type { Swarm, ArraySwarm } from "./shared/swarm";
+export { initArraySwarm } from "./immutable/swarm";
+export type { Swarm, ArraySwarm } from "./immutable/swarm";
 export type { Agent, Hyp } from "./shared/type";

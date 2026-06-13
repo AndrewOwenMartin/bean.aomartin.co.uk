@@ -1,5 +1,5 @@
-import { choice, randChance } from "../shared/polling";
-import { Swarm } from "../shared/swarm";
+import { choice, randChance } from "./polling";
+import { Swarm } from "./swarm";
 import { Agent, Hyp } from "../shared/type";
 export type Microtest = (hyp: Hyp) => boolean;
 export type Testing = (hyp: Hyp) => Agent;
