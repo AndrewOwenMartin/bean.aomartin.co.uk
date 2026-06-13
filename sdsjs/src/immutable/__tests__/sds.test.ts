@@ -1,9 +1,9 @@
-import { ArraySwarm, initArraySwarm } from "../../shared/swarm";
-import { countClusters } from "../../analysis/clusters";
+import { expect, test } from "@jest/globals";
 import { SDSStandard } from "../sds";
 import { DHUniform, DPassive } from "../diffusion";
 import { makeHFixed } from "../halting";
 import { TMUniform, TBoolean, Microtest } from "../testing";
+import { initArraySwarm } from "../swarm";
 
 test("DHUniform 1 returns zero", () => {
   expect(DHUniform(1)).toBe(0);
@@ -16,22 +16,22 @@ test("TMUniform with one element returns that element", () => {
 
 test("DPassive with active agent", () => {
   const agent = { active: true, hyp: 0 };
-  const swarm = initArraySwarm(0)
+  const swarm = initArraySwarm(0);
   expect(DPassive(() => 0, agent, swarm)).toBe(0);
 });
 
 test("DPassive with inactive agent and active polled agent", () => {
-  const swarm = initArraySwarm(1)
+  const swarm = initArraySwarm(1);
   const polled = { active: true, hyp: 1 };
-  swarm.agents[0] = polled
+  swarm.agents[0] = polled;
   const agent = { active: false, hyp: 0 };
   expect(DPassive(() => 0, agent, swarm)).toBe(1);
 });
 
 test("DPassive with inactive agent and inactive polled agent", () => {
-  const swarm = initArraySwarm(1)
+  const swarm = initArraySwarm(1);
   const polled = { active: false, hyp: 1 };
-  swarm.agents[0] = polled
+  swarm.agents[0] = polled;
   const agent = { active: false, hyp: 0 };
   const DH = () => 2;
   expect(DPassive(DH, agent, swarm)).toBe(2);
@@ -93,13 +93,12 @@ test("sds standard", () => {
   const SDS = SDSStandard(mySearchSpace.length, myMicrotests, maxIterations);
 
   const swarm = initArraySwarm(agentCount);
-  const result = SDS(swarm) as ArraySwarm;
+  const result = SDS(swarm);
 
-  const clusters = countClusters(result);
+  const clusters = result.getClusters(10, 1);
 
-  const clusterNames = [...clusters.keys()].map(String);
-  const clusterSizes = [...clusters.values()];
-  const optimalClusterLocation = clusterNames.indexOf("5");
-  const optimalClusterSize = clusterSizes[optimalClusterLocation];
+  const optimalClusterSize = clusters.get(5);
+  const clusterSizes = Array.from(clusters.values());
+
   expect(Math.max(...clusterSizes)).toEqual(optimalClusterSize);
 });

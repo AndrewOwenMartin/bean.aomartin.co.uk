@@ -1,8 +1,6 @@
-import { initArraySwarm } from "../../shared/swarm";
+import { expect, test } from '@jest/globals'
 import {
   DChance,
-  DContextFree,
-  DContextSensitive,
   DHermit,
   DMultiDiffusion,
   DMultiDiffusionOr,
@@ -30,6 +28,7 @@ import {
   HAnd,
   HOr,
 } from "../halting";
+import { initArraySwarm } from "../swarm";
 
 // ─── Diffusion ────────────────────────────────────────────────────────────────
 
