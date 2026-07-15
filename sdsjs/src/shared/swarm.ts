@@ -44,8 +44,8 @@ const makeArraySwarm = (agents: Agent[]): ArraySwarm => ({
       }
     }
     const sorted = [...counts.entries()]
-      .filter(([, n]) => n >= minClusterSize)
-      .sort(([, a], [, b]) => b - a)
+      .filter(([, clusterSize]) => clusterSize >= minClusterSize)
+      .sort(([, clusterSizeA], [, clusterSizeB]) => clusterSizeB - clusterSizeA)
       .slice(0, maxClusters);
     return new Map(sorted);
   },
@@ -68,16 +68,3 @@ export const initHashSwarm = (agentCount: number): Swarm => {
     // type: 'hashSwarm',
   };
 }
-
-// export const makeSwarm = (agentCount: number) => {
-//   const swarm = initSwarm(agentCount)
-
-//   const poll = (swarm: Swarm): Agent => {
-//     return choice(swarm);
-//   };
-
-//   return {
-//     swarm,
-//     poll,
-//   }
-// }

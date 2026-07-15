@@ -2,11 +2,14 @@ import { choice, poll, randChance, randInt } from "../shared/polling";
 import { Swarm } from "../shared/swarm";
 import { Agent, Hyp } from "../shared/type";
 export type Diffusion = (agent: Agent, swarm: Swarm) => Hyp;
-export type NewHyp = () => Hyp;
+export type DHFunction = () => Hyp;
 export type DiffusionCombinator = (polled: Agent[]) => Agent | null;
 export type NoiseFunction = (hyp: Hyp) => Hyp;
 
-export const DPassive = (DH: NewHyp, agent: Agent, swarm: Swarm): Hyp => {
+export const DPassive = (DH: DHFunction, agent: Agent, swarm: Swarm): Hyp => {
+  /*
+   * Standard Diffusion
+  */
   if (agent.active) {
     return agent.hyp;
   }
@@ -19,51 +22,69 @@ export const DPassive = (DH: NewHyp, agent: Agent, swarm: Swarm): Hyp => {
 };
 
 export const DChance = (
-  chance: number,
-  DH: NewHyp,
+  p: number,
+  DH: DHFunction,
   agent: Agent,
   swarm: Swarm,
 ): Hyp => {
-  if (randChance(chance)) {
+  /*
+   * Agents generate new hypotheses with probability P. Else perform passive diffusion.
+  */
+  if (randChance(p)) {
     return DH();
   }
   return DPassive(DH, agent, swarm);
 };
 
-export const DContextFree = (DH: NewHyp, agent: Agent, swarm: Swarm): Hyp => {
+export const DContextFree = (DH: DHFunction, agent: Agent, swarm: Swarm): Hyp => {
+  /*
+   * Passive Diffusion + DH if both agents are active
+   */
   const polled = swarm.poll()
 
   // Generate a new hypothesis if both agents are active, or both are inactive.
-  const newHyp = agent.active === polled.active;
+  if (agent.active === polled.active) {
+    return DH()
+  }
 
   // If only polled is active, diffuse. If only agent is active, maintain.
-  const hyp = newHyp ? DH() : agent.active ? agent.hyp : polled.hyp;
-
-  return hyp;
+  return agent.active ? agent.hyp : polled.hyp;
 };
 
 export const DContextSensitive = (
-  DH: NewHyp,
+  DH: DHFunction,
   agent: Agent,
   swarm: Swarm,
 ): Hyp => {
+  /*
+   * Passive Diffusion + DH if both agents are active and share a hypothesis.
+  */
   const polled = swarm.poll()
-  let hyp = agent.hyp;
   if (!agent.active && polled.active) {
-    hyp = polled.hyp;
-  } else if (!agent.active || (polled.active && polled.hyp === agent.hyp)) {
-    hyp = DH();
+    return polled.hyp;
   }
-  return hyp;
+  if (!agent.active || (polled.active && polled.hyp === agent.hyp)) {
+    return DH();
+  }
+  return agent.hyp
 };
 
-export const DHUniform = (hypCount: number) => randInt(hypCount);
+export const DHUniform = (hypCount: number) => {
+  // New Hypothesis selected uniformly at random
+  return randInt(hypCount);
+}
 
-// Issue 05: hermit diffusion — active polled agents refuse to share with probability `hermitage`
-export const DHermit = (hermitage: number, DH: NewHyp, agent: Agent, swarm: Swarm): Hyp => {
-  if (agent.active) return agent.hyp;
+export const DHermit = (hermitage: number, DH: DHFunction, agent: Agent, swarm: Swarm): Hyp => {
+  /*
+   * Issue 05: hermit diffusion — active polled agents refuse to share with probability `hermitage`
+   */
+  if (agent.active) {
+    return agent.hyp;
+  }
   const polled = swarm.poll();
-  if (polled.active && !randChance(hermitage)) return polled.hyp;
+  if (polled.active && !randChance(hermitage)) {
+    return polled.hyp;
+  }
   return DH();
 };
 
@@ -71,11 +92,13 @@ export const DHermit = (hermitage: number, DH: NewHyp, agent: Agent, swarm: Swar
 export const DMultiDiffusion = (
   amount: number,
   combinator: DiffusionCombinator,
-  DH: NewHyp,
+  DH: DHFunction,
   agent: Agent,
   swarm: Swarm,
 ): Hyp => {
-  if (agent.active) return agent.hyp;
+  if (agent.active) {
+    return agent.hyp;
+  }
   const polled = Array.from({ length: amount }, () => swarm.poll());
   const chosen = combinator(polled);
   return chosen ? chosen.hyp : DH();
@@ -90,7 +113,7 @@ export const DMultiDiffusionAnd: DiffusionCombinator = (polled) =>
   polled.every(a => a.active) ? choice(polled) : null;
 
 // Issue 07: noisy diffusion — apply a perturbation function to the recruited hypothesis
-export const DNoise = (noise: NoiseFunction, DH: NewHyp, agent: Agent, swarm: Swarm): Hyp => {
+export const DNoise = (noise: NoiseFunction, DH: DHFunction, agent: Agent, swarm: Swarm): Hyp => {
   if (agent.active) return agent.hyp;
   const polled = swarm.poll();
   return polled.active ? noise(polled.hyp) : DH();

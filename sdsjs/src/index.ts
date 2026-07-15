@@ -12,7 +12,7 @@ export {
   DNoise,
   makeGaussianNoise,
 } from "./immutable/diffusion";
-export type { NewHyp, DiffusionCombinator, NoiseFunction } from "./immutable/diffusion";
+export type { DHFunction, DiffusionCombinator, NoiseFunction } from "./immutable/diffusion";
 export {
   TBoolean,
   TMUniform,

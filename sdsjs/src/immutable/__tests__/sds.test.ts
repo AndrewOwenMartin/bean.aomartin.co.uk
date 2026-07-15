@@ -1,5 +1,4 @@
 import { ArraySwarm, initArraySwarm } from "../../shared/swarm";
-import { countClusters } from "../../analysis/clusters";
 import { SDSStandard } from "../sds";
 import { DHUniform, DPassive } from "../diffusion";
 import { makeHFixed } from "../halting";
@@ -95,7 +94,7 @@ test("sds standard", () => {
   const swarm = initArraySwarm(agentCount);
   const result = SDS(swarm) as ArraySwarm;
 
-  const clusters = countClusters(result);
+  const clusters = swarm.getClusters(Infinity, 1);
 
   const clusterNames = [...clusters.keys()].map(String);
   const clusterSizes = [...clusters.values()];

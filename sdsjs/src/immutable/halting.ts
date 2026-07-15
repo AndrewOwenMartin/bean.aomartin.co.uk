@@ -1,5 +1,4 @@
 import { Swarm } from "../shared/swarm";
-import { Hyp } from "../shared/type";
 
 export type HaltingFn = () => boolean;
 
