@@ -17,3 +17,6 @@ To deploy
 
 `cd` into `sdsjs`.
 Do `npm run $foo` where foo is one of the scripts listed in `package.json`.
+
+E.g. To Run Tests.
+cd sdsjs; npm run test
