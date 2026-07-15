@@ -1,4 +1,4 @@
-import { Swarm } from "../shared/swarm";
+import { Swarm } from "./swarm";
 
 export type HaltingFn = () => boolean;
 

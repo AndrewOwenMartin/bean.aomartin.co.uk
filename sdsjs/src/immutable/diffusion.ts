@@ -1,5 +1,5 @@
-import { choice, poll, randChance, randInt } from "../shared/polling";
-import { Swarm } from "../shared/swarm";
+import { choice, poll, randChance, randInt } from "./polling";
+import { Swarm } from "./swarm";
 import { Agent, Hyp } from "../shared/type";
 export type Diffusion = (agent: Agent, swarm: Swarm) => Hyp;
 export type DHFunction = () => Hyp;

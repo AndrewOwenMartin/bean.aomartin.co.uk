@@ -1,4 +1,4 @@
-import { Swarm } from "../shared/swarm";
+import { Swarm } from "./swarm";
 import { Agent, Hyp } from "../shared/type";
 import { DHUniform, DPassive } from "./diffusion";
 import { makeHFixed } from "./halting";
