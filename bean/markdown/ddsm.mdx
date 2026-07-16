@@ -1,0 +1,45 @@
+# The Discrete Dynamical Systems model of SDS
+
+This analysis assumes the search space contains exactly one hypothesis with a
+quality larger than any other hypothesis, called the optimal hypothesis, and
+many hypotheses with a significantly lower score, the collective effect of
+which can be described by a single value known collectively as homogeneous
+background noise.
+
+Introduced in [60] and explored in [62], the Discrete Dynamical System Model (DDSM) of
+SDS has been used to clearly express results previously reached via other methods as well
+as new models of the behaviour of SDS. The DDSM introduces the following notation.
+
+- α the score of the optimal hypothesis
+- β the mean probability of an agent at any non-optimal hypothesis becoming active
+- c ̄i the mean number of active agents maintaining the optimal hypothesis as a proportion
+  of the total population
+- S the search space size, the number of potential hypotheses
+  in a search space
+- A the swarm size, the number of agents in a swarm
+- "global activity" The proportion of the swarm which are active at a given time
+
+In Standard SDS, after the test phase, if you have:
+
+- a swarm of S agents.
+- a cluster of c active agents.
+- a noise of B
+  There will be
+- (1-a/a)c inactive at the cluster
+- [1-b][1-(c/a)] inactive with noise hypotheses
+- b(1-c/a) active with noise hypotheses
+- c/a active and inactive at the cluster
+- 1-c/a active and inactive with noise hypotheses
+
+The cluster will be stable when leaving = arriving.
+Arriving = diffusing in + hypothesising in
+diffusing in = total inactive * active at cluster
+= (((1-a)/a)*c + (1-b)_(1-c/a)) _ c
+Leaving = going inactive = c \* (1-a)
+
+Simplfies to
+(b-a)(c/a - 1) = 0
+or
+(b-a)(c-a) = 0
+
+Where either a=b or a=c

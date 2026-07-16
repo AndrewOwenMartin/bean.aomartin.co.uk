@@ -119,8 +119,7 @@ equilibrium size and neither can crowd out the other. Two stable clusters coexis
 | Context-free SDS      | Total active agents (global cap)             |
 | Context-sensitive SDS | Active agents per cluster (per-cluster cap)  |
 
-Context-sensitive is the more surgical of the two. It gives multiple hypotheses room to
-each maintain a stable cluster, while still preventing any single cluster from monopolising
+Context-sensitive allows stable clusters to form, stoppinttttt single cluster from monopolising
 the swarm.
 
 ## Robustness
@@ -153,3 +152,5 @@ to grow indefinitely. The swarm reaches a predictable equilibrium, which makes i
 to detect that a cluster has formed — and to trust that it won't keep changing once
 detected. This comes at the cost of a higher minimum convergence threshold: context-free
 SDS needs a stronger signal to form any cluster at all.
+
+
