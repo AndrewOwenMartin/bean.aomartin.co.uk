@@ -1,14 +1,28 @@
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import styles from '../styles/card.module.css'
+
+interface NavLink{
+  url: string;
+  label: string;
+}
+
+const links: NavLink[] = [
+  {url: "/", label: "Intro"},
+  {url: "/stories", label: "Stories"},
+  {url: "/future-work", label: "Future Work"},
+  {url: "/hypothesis-mutation", label: "Hypothesis Mutation"},
+  {url: "/context-free-sensitive", label: "Context Free & Sensitive"},
+  {url: "/ddsm", label: "DDSM"},
+]
 
 export const Route = createRootRoute({
   component: () => (
     <>
       <nav>
-        <Link to="/">Intro</Link>
-        <Link to="/stories">Stories</Link>
-        <Link to="/future-work">Future Work</Link>
-        <Link to="/hypothesis-mutation">Hypothesis Mutation</Link>
-        <Link to="/context-free-sensitive">Context Free & Sensitive</Link>
+      <ul className={styles.navList}>
+        {links.map((link) => <li key={link.url}><Link to={link.url}>{link.label}</Link></li>)}
+
+        </ul>
       </nav>
       <Outlet />
     </>

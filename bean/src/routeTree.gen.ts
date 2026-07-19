@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as StoriesRouteImport } from './routes/stories'
 import { Route as HypothesisMutationRouteImport } from './routes/hypothesis-mutation'
 import { Route as FutureWorkRouteImport } from './routes/future-work'
+import { Route as DdsmRouteImport } from './routes/ddsm'
 import { Route as ContextFreeSensitiveRouteImport } from './routes/context-free-sensitive'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -30,6 +31,11 @@ const FutureWorkRoute = FutureWorkRouteImport.update({
   path: '/future-work',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DdsmRoute = DdsmRouteImport.update({
+  id: '/ddsm',
+  path: '/ddsm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContextFreeSensitiveRoute = ContextFreeSensitiveRouteImport.update({
   id: '/context-free-sensitive',
   path: '/context-free-sensitive',
@@ -44,6 +50,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/context-free-sensitive': typeof ContextFreeSensitiveRoute
+  '/ddsm': typeof DdsmRoute
   '/future-work': typeof FutureWorkRoute
   '/hypothesis-mutation': typeof HypothesisMutationRoute
   '/stories': typeof StoriesRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/context-free-sensitive': typeof ContextFreeSensitiveRoute
+  '/ddsm': typeof DdsmRoute
   '/future-work': typeof FutureWorkRoute
   '/hypothesis-mutation': typeof HypothesisMutationRoute
   '/stories': typeof StoriesRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/context-free-sensitive': typeof ContextFreeSensitiveRoute
+  '/ddsm': typeof DdsmRoute
   '/future-work': typeof FutureWorkRoute
   '/hypothesis-mutation': typeof HypothesisMutationRoute
   '/stories': typeof StoriesRoute
@@ -68,6 +77,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/context-free-sensitive'
+    | '/ddsm'
     | '/future-work'
     | '/hypothesis-mutation'
     | '/stories'
@@ -75,6 +85,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/context-free-sensitive'
+    | '/ddsm'
     | '/future-work'
     | '/hypothesis-mutation'
     | '/stories'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/context-free-sensitive'
+    | '/ddsm'
     | '/future-work'
     | '/hypothesis-mutation'
     | '/stories'
@@ -90,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContextFreeSensitiveRoute: typeof ContextFreeSensitiveRoute
+  DdsmRoute: typeof DdsmRoute
   FutureWorkRoute: typeof FutureWorkRoute
   HypothesisMutationRoute: typeof HypothesisMutationRoute
   StoriesRoute: typeof StoriesRoute
@@ -118,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FutureWorkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ddsm': {
+      id: '/ddsm'
+      path: '/ddsm'
+      fullPath: '/ddsm'
+      preLoaderRoute: typeof DdsmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/context-free-sensitive': {
       id: '/context-free-sensitive'
       path: '/context-free-sensitive'
@@ -138,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContextFreeSensitiveRoute: ContextFreeSensitiveRoute,
+  DdsmRoute: DdsmRoute,
   FutureWorkRoute: FutureWorkRoute,
   HypothesisMutationRoute: HypothesisMutationRoute,
   StoriesRoute: StoriesRoute,

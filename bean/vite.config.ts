@@ -3,15 +3,29 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
 import mdx from '@mdx-js/rollup'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     TanStackRouterVite({ target: 'react', autoCodeSplitting: true }),
-    mdx(),
+    mdx(
+      {
+      // Essential for React 17+: tells MDX to use the modern automatic JSX runtime
+      jsxImportSource: 'react', 
+      remarkPlugins: [remarkMath],
+      rehypePlugins: [rehypeKatex],
+    }
+    ),
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+  css: {
+    modules: {
+      localsConvention: 'camelCaseOnly',
+    },
+  },
   server:{
     host: "0.0.0.0",
   },

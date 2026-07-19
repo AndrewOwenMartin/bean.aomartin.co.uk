@@ -5,6 +5,15 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
-    "types": ["node", "jest"]
+    "jsx": "react-jsx",
+    "types": ["node", "jest"],
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules",
+        "options": {
+          "camelCase": true
+        }
+      }
+    ]
   }
 }
