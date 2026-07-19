@@ -2,56 +2,29 @@
 
 ## The winner-takes-all problem
 
-Standard SDS converges hard. Once a cluster forms at a high-scoring hypothesis, it tends
-to grow until it dominates the swarm — most agents pile onto the best answer found so far,
-and exploration slows to a trickle.
+Standard SDS has been criticised for its behaviour of forming a single large cluster, leaving few agents to test hypotheses in the remainder of the search space, hence possibly missing superior solutions. To decrease the number of active agents and hence to increase the number of agents generating new hypotheses two variants have been defined in which active agents may become inactive during the diffusion phase. The variants are named context-free diffusion and context-sensitive diffusion.
 
-For many tasks, that's exactly what you want. But consider what happens when the search
-space contains two equally good answers. Standard SDS will converge on one of them. The
-other starves. The cluster at the "winner" can be orders of magnitude larger than any
-activity at the second answer. Eventually the two might trade dominance back and forth,
-but at any given moment the swarm is committed to one hypothesis and barely looking at
-anything else.
+**Context-free diffusion** introduces a mechanism where active agents poll an agent at random from the swarm and in the case that the polled agent is active, the polling agent will generate a new hypothesis using `DH`.
 
-There are three situations where this is a problem:
-
-1. **Multiple optimal hypotheses** — there are several equally good answers and you want
-   to find all of them, not just one.
-2. **Top-k search** — you want the best hypothesis *and* the next-best ones ranked
-   below it.
-3. **Dynamic search spaces** — the search space is changing over time, so the optimal
-   answer now may not be optimal later. Standard SDS tracks a moving optimum eventually,
-   but a large cluster is slow to abandon: agents only leave through test failures. In
-   context-free SDS, active agents also leave through collisions — the larger the old
-   cluster, the faster it erodes. A new optimum therefore has more free agents available
-   to discover it *and* active pressure clearing the old cluster at the same time.
-
-In all three cases, you need the swarm to keep exploring even after it has found something
-good. The two variants here do this by adding a cost to being active: an active agent can
-now be knocked back to inactive during the diffusion phase.
+**Context-sensitive diffusion** introduces a similar mechanism but adds an extra clause. Active agents poll an agent at random from the swarm but the polling agent will only generate a new hypothesis using `DH` if the polled agent is active _and_ both agents share the same hypothesis.
 
 ## Context-free diffusion
 
-In standard SDS, only inactive agents act during diffusion. Active agents sit on their
-hypothesis and wait for the next test. Context-free diffusion changes this: every agent
-polls a random agent, active or not.
+In standard SDS, only inactive agents act during diffusion. Active agents maintain their
+hypothesis. Context-free diffusion changes this: every agent polls a random agent, active or not.
 
 The new rule: if an active agent polls another active agent, it calls DH() and randomises
-its hypothesis — the same thing an inactive agent does when it finds nobody to recruit
-from. In both cases, the polling agent starts fresh.
+its hypothesis — the same thing an inactive agent does when it polls an inactive agent.
 
 ```
 DCONTEXT-FREE(agent, swarm):
   polled ← random agent in swarm
 
-  if agent is inactive and polled is active:
-    hypothesis of agent ← hypothesis of polled
-
-  else if agent is active and polled is active:
-    hypothesis of agent ← DH()
-
-  else if agent is inactive:
-    hypothesis of agent ← DH()
+  if agent is inactive or polled is active:
+    if agent is inactive and polled is active:
+      hypothesis of agent ← hypothesis of polled
+    else
+      hypothesis of agent ← DH()
 ```
 
 The effect on the swarm: as a cluster grows, collisions between active agents become more
@@ -67,10 +40,9 @@ has a second attrition mechanism that scales directly with cluster size.
 Context-free diffusion has a side-effect: clusters at different hypotheses interfere with
 each other. An active agent at hypothesis A can collide with an active agent at hypothesis B
 and get knocked out, even though the two clusters have nothing to do with each other.
-The bumping is indiscriminate.
 
 Context-sensitive diffusion adds one condition: an active agent is only knocked inactive
-if it collides with another active agent *at the same hypothesis*.
+if it collides with another active agent *maintaining the same hypothesis*.
 
 ```
 DCONTEXT-SENSITIVE(agent, swarm):
@@ -78,12 +50,11 @@ DCONTEXT-SENSITIVE(agent, swarm):
 
   if agent is inactive and polled is active:
     hypothesis of agent ← hypothesis of polled
-
-  else if agent is active and polled is active and same hypothesis:
-    hypothesis of agent ← DH()
-
-  else if agent is inactive:
-    hypothesis of agent ← DH()
+  else
+    a ← agent is inactive
+    b ← polled is active and hypothesis of agent = hypothesis of polled
+    if a or b:
+      hypothesis of agent ← DH()
 ```
 
 The effect: the cap is per cluster rather than global. Within each cluster, collisions
@@ -119,8 +90,7 @@ equilibrium size and neither can crowd out the other. Two stable clusters coexis
 | Context-free SDS      | Total active agents (global cap)             |
 | Context-sensitive SDS | Active agents per cluster (per-cluster cap)  |
 
-Context-sensitive allows stable clusters to form, stoppinttttt single cluster from monopolising
-the swarm.
+Context-sensitive allows stable clusters to form, stopping any single cluster from monopolising the swarm.
 
 ## Robustness
 
