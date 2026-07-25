@@ -5,6 +5,8 @@ import mdx from '@mdx-js/rollup'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import tsconfigPaths from 'vite-tsconfig-paths';
+import remarkGfm from 'remark-gfm';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,12 +16,13 @@ export default defineConfig({
       {
       // Essential for React 17+: tells MDX to use the modern automatic JSX runtime
       jsxImportSource: 'react', 
-      remarkPlugins: [remarkMath],
+      remarkPlugins: [remarkMath, remarkGfm],
       rehypePlugins: [rehypeKatex],
     }
     ),
     react(),
-    babel({ presets: [reactCompilerPreset()] })
+    babel({ presets: [reactCompilerPreset()] }),
+    tsconfigPaths()
   ],
   css: {
     modules: {

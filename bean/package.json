@@ -17,8 +17,10 @@
     "react-dom": "^19.2.4",
     "react-katex": "^3.1.0",
     "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
-    "sds": "*"
+    "sds": "*",
+    "vite-tsconfig-paths": "^6.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",

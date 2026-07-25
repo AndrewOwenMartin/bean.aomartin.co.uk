@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StoriesRouteImport } from './routes/stories'
+import { Route as StandardSdsSummaryRouteImport } from './routes/standard-sds-summary'
 import { Route as HypothesisMutationRouteImport } from './routes/hypothesis-mutation'
 import { Route as FutureWorkRouteImport } from './routes/future-work'
 import { Route as DdsmRouteImport } from './routes/ddsm'
@@ -19,6 +20,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const StoriesRoute = StoriesRouteImport.update({
   id: '/stories',
   path: '/stories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StandardSdsSummaryRoute = StandardSdsSummaryRouteImport.update({
+  id: '/standard-sds-summary',
+  path: '/standard-sds-summary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HypothesisMutationRoute = HypothesisMutationRouteImport.update({
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/ddsm': typeof DdsmRoute
   '/future-work': typeof FutureWorkRoute
   '/hypothesis-mutation': typeof HypothesisMutationRoute
+  '/standard-sds-summary': typeof StandardSdsSummaryRoute
   '/stories': typeof StoriesRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/ddsm': typeof DdsmRoute
   '/future-work': typeof FutureWorkRoute
   '/hypothesis-mutation': typeof HypothesisMutationRoute
+  '/standard-sds-summary': typeof StandardSdsSummaryRoute
   '/stories': typeof StoriesRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/ddsm': typeof DdsmRoute
   '/future-work': typeof FutureWorkRoute
   '/hypothesis-mutation': typeof HypothesisMutationRoute
+  '/standard-sds-summary': typeof StandardSdsSummaryRoute
   '/stories': typeof StoriesRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/ddsm'
     | '/future-work'
     | '/hypothesis-mutation'
+    | '/standard-sds-summary'
     | '/stories'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/ddsm'
     | '/future-work'
     | '/hypothesis-mutation'
+    | '/standard-sds-summary'
     | '/stories'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/ddsm'
     | '/future-work'
     | '/hypothesis-mutation'
+    | '/standard-sds-summary'
     | '/stories'
   fileRoutesById: FileRoutesById
 }
@@ -105,6 +117,7 @@ export interface RootRouteChildren {
   DdsmRoute: typeof DdsmRoute
   FutureWorkRoute: typeof FutureWorkRoute
   HypothesisMutationRoute: typeof HypothesisMutationRoute
+  StandardSdsSummaryRoute: typeof StandardSdsSummaryRoute
   StoriesRoute: typeof StoriesRoute
 }
 
@@ -115,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/stories'
       fullPath: '/stories'
       preLoaderRoute: typeof StoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/standard-sds-summary': {
+      id: '/standard-sds-summary'
+      path: '/standard-sds-summary'
+      fullPath: '/standard-sds-summary'
+      preLoaderRoute: typeof StandardSdsSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hypothesis-mutation': {
@@ -161,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   DdsmRoute: DdsmRoute,
   FutureWorkRoute: FutureWorkRoute,
   HypothesisMutationRoute: HypothesisMutationRoute,
+  StandardSdsSummaryRoute: StandardSdsSummaryRoute,
   StoriesRoute: StoriesRoute,
 }
 export const routeTree = rootRouteImport

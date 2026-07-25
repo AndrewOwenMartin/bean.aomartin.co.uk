@@ -13,6 +13,7 @@ const links: NavLink[] = [
   {url: "/hypothesis-mutation", label: "Hypothesis Mutation"},
   {url: "/context-free-sensitive", label: "Context Free & Sensitive"},
   {url: "/ddsm", label: "DDSM"},
+  {url: "/standard-sds-summary", label: "Standard SDS Summary"},
 ]
 
 export const Route = createRootRoute({
