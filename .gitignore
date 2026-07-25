@@ -1,2 +1,5 @@
 node_modules
 thesis/thesis-andrew-owen-martin.pdf
+analysis/.venv
+analysis/python/__pycache__
+analysis/python/variants/__pycache__
