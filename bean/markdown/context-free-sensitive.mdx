@@ -2,22 +2,23 @@
 
 ## The winner-takes-all problem
 
-Standard SDS has been criticised for its behaviour of forming a single large cluster, leaving few agents to test hypotheses in the remainder of the search space, hence possibly missing superior solutions. To decrease the number of active agents and hence to increase the number of agents generating new hypotheses two variants have been defined in which active agents may become inactive during the diffusion phase. The variants are named context-free diffusion and context-sensitive diffusion.
+Standard SDS has been criticised for its behaviour of forming a single large cluster, leaving few agents to test hypotheses in the remainder of the search space and potentially missing superior solutions.
+Two variants have been defined which decrease the number of active agents and hence to increase the number of agents generating new hypotheses.
+These variants add the possibility of active agents generating new hypotheses during the diffusion phase.
+The variants are named context-free diffusion and context-sensitive diffusion.
 
 **Context-free diffusion** introduces a mechanism where active agents poll an agent at random from the swarm and in the case that the polled agent is active, the polling agent will generate a new hypothesis using `DH`.
 
-**Context-sensitive diffusion** introduces a similar mechanism but adds an extra clause. Active agents poll an agent at random from the swarm but the polling agent will only generate a new hypothesis using `DH` if the polled agent is active _and_ both agents share the same hypothesis.
+**Context-sensitive diffusion** introduces a similar mechanism but adds an extra condition. Active agents poll an agent at random from the swarm but the polling agent will only generate a new hypothesis using `DH` if the polled agent is active _and_ both agents share the same hypothesis.
 
 ## Context-free diffusion
 
-In standard SDS, only inactive agents act during diffusion. Active agents maintain their
-hypothesis. Context-free diffusion changes this: every agent polls a random agent, active or not.
+In standard SDS, only inactive agents act during diffusion. Active agents maintain their hypothesis. Context-free diffusion changes this: every agent polls a random agent, active or not.
 
-The new rule: if an active agent polls another active agent, it calls DH() and randomises
-its hypothesis — the same thing an inactive agent does when it polls an inactive agent.
+The new rule: if an active agent polls another active agent, it calls DH() and randomises its hypothesis.
 
 ```
-DCONTEXT-FREE(agent, swarm):
+D-CONTEXT-FREE(agent, swarm):
   polled ← random agent in swarm
 
   if agent is inactive or polled is active:
@@ -64,8 +65,7 @@ size, none able to dominate the swarm entirely.
 
 ## Two equal peaks
 
-The clearest way to see the difference between these variants is to put the swarm in front
-of two hypotheses with identical scores.
+The clearest way to see the difference between these variants is to consider a swarm in a search space with two hypotheses with identical scores.
 
 **Standard SDS** does not split evenly. Two perfectly equal clusters are an unstable
 equilibrium: any small fluctuation tips the balance, triggering a positive feedback loop
@@ -108,19 +108,3 @@ Context-sensitive SDS matches the robustness of standard SDS — adding the per-
 cap costs nothing in terms of noise tolerance. Context-free SDS has lower robustness: the
 global cap keeps clusters smaller, and smaller clusters need a stronger signal to hold
 together.
-
-## Connection to halting
-
-One of the challenges in halting SDS is detecting that a stable cluster has formed. Standard
-SDS keeps growing past the point of detection, so any threshold-based halting method
-risks either halting too early (before a good cluster forms) or too late (after unnecessary
-searching).
-
-Context-free SDS has a natural advantage here. Because the global cap limits cluster size,
-the stable cluster size is determined by the algorithm parameters rather than continuing
-to grow indefinitely. The swarm reaches a predictable equilibrium, which makes it easier
-to detect that a cluster has formed — and to trust that it won't keep changing once
-detected. This comes at the cost of a higher minimum convergence threshold: context-free
-SDS needs a stronger signal to form any cluster at all.
-
-

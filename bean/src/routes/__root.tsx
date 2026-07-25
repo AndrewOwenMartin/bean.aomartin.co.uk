@@ -14,6 +14,9 @@ const links: NavLink[] = [
   {url: "/context-free-sensitive", label: "Context Free & Sensitive"},
   {url: "/ddsm", label: "DDSM"},
   {url: "/standard-sds-summary", label: "Standard SDS Summary"},
+  {url: "/context-free-sds-summary", label: "Context-free SDS Summary"},
+  {url: "/context-sensitive-sds-summary", label: "Context-sensitive SDS Summary"},
+  {url: "/context-sensitive-multi-cluster", label: "Context-sensitive Multi-cluster"},
 ]
 
 export const Route = createRootRoute({

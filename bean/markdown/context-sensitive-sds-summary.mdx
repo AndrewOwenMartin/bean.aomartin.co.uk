@@ -1,0 +1,53 @@
+# Context-sensitive SDS: DDSM results
+
+Cleaned restatement of `thesis/003.4-variants-of-sds.md` §3.4.3.1.
+
+## Assumptions
+
+Same DDSM assumptions as standard SDS (see [Standard SDS summary](/standard-sds-summary)):
+
+- Exactly one hypothesis has a score higher than all others (the **optimal hypothesis**).
+- All other hypotheses' collective effect is modelled as a single value, **homogeneous
+  background noise**.
+- $S$ — search space size. $A$ — swarm size.
+- $\alpha$ — score of the optimal hypothesis. $\beta$ — mean probability of an agent at any
+  non-optimal hypothesis becoming active. $\bar{c}_i$ — mean proportion of the population
+  that are active agents maintaining the optimal hypothesis.
+
+Context-sensitive diffusion additionally assumes agents at the noise hypothesis never
+become inactive during the diffusion phase — an imperfect assumption, since diffusion
+causes noise agents to duplicate identical hypotheses.
+
+## One-step evolution function
+
+$$\bar{c}_{i+1} = \bar{c}_i\big[\alpha(2-\beta)\big] - \bar{c}_i^{\,2}(2\alpha-\beta)$$
+
+## Minimum convergence criterion
+
+$$\alpha_{\min} = \frac{1}{2-\beta}$$
+
+Identical to standard SDS — the per-cluster cap costs nothing in minimum convergence
+criterion.
+
+## Robustness
+
+$$\zeta = 2(1-\ln 2) \approx 0.614$$
+
+Matches standard SDS: adding the per-cluster cap costs nothing in noise tolerance.
+
+## Steady state
+
+$$\gamma = \frac{\alpha(2-\beta) - 1}{2\alpha-\beta}$$
+
+Solved as the fixed point of the one-step evolution function above. See
+[Context-sensitive multi-cluster analysis](/context-sensitive-multi-cluster) for the
+extension to multiple simultaneously-viable hypotheses, which builds on this value.
+
+## What it caps
+
+Context-sensitive diffusion caps the **number of active agents per cluster** (a per-cluster
+cap): an active agent is only knocked inactive when it collides with another active agent
+maintaining the *same* hypothesis, so clusters at different hypotheses don't interfere with
+each other. Multiple clusters can therefore form and coexist stably. See
+[Context-free and context-sensitive SDS](/context-free-sensitive) for the diffusion
+mechanism and worked comparison with standard and context-free SDS.

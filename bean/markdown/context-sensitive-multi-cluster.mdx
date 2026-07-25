@@ -1,0 +1,91 @@
+# Context-sensitive SDS: multiple simultaneous clusters
+
+Original derivation extending the DDSM in `thesis/003.4-variants-of-sds.md` §3.4.3.1 to
+the case where more than one hypothesis scores high enough to sustain a cluster
+(i.e. every tracked score exceeds $\alpha_{\min} = \dfrac{1}{2-\beta}$). See
+[Context-sensitive SDS summary](/context-sensitive-sds-summary) for the single-cluster
+model this builds on.
+
+## Why this needs a new model
+
+The single-cluster context-sensitive DDSM tracks one optimal hypothesis at score $\alpha$
+against a single homogeneous background noise term $\beta$. That model has nothing to say
+about what happens when *two or more* hypotheses are individually strong enough to hold
+their own cluster — which is exactly the situation context-sensitive diffusion is designed
+to permit, since clusters at different hypotheses never knock each other out.
+
+## Setting up the coupled model
+
+Each cluster's one-step evolution keeps the structure of the single-cluster case,
+$f = \alpha\big[\bar c_i(1 + g) - \bar c_i^2\big]$, where the $-\bar c_i^2$ term is the
+self-collision loss: an active agent is only knocked inactive by colliding with another
+active agent *at the same hypothesis*. This term stays self-contained per cluster — that
+is the defining property of context-sensitive diffusion. What clusters *do* share is the
+pool of inactive agents available for recruitment during diffusion.
+
+For $K$ simultaneous clusters at scores $\alpha_1,\dots,\alpha_K$ (each $> \alpha_{\min}$),
+sharing one background noise rate $\beta$:
+
+$$\bar c_{k,i+1} = \alpha_k\Big[\bar c_{k,i}(1+G_i) - \bar c_{k,i}^{\,2}\Big]$$
+
+$$G_i = \sum_j \frac{1-\alpha_j}{\alpha_j}\bar c_{j,i} \;+\; (1-\beta)\Big(1 - \sum_j \frac{\bar c_{j,i}}{\alpha_j}\Big)$$
+
+$G_i$ is the total inactive population: the sum of agents inactive-but-holding one of the
+$K$ tracked hypotheses, plus the inactive share of whatever's left over in the noise pool.
+Recruitment into cluster $k$ during diffusion is proportional to $G_i$ and to $\bar c_{k,i}$
+(the probability a randomly polled agent happens to be active at hypothesis $k$) — this is
+the coupling between clusters: they all draw from the same $G_i$.
+
+## Two hypotheses, identical score
+
+Setting $\alpha_1 = \alpha_2 = \alpha$ and solving the coupled fixed point
+($\bar c_1 = \bar c_2 = \bar c$ by symmetry):
+
+$$\bar c = \frac{\alpha(2-\beta) - 1}{3\alpha - 2\beta}$$
+
+Compare with the single-cluster steady state $\dfrac{\alpha(2-\beta)-1}{2\alpha-\beta}$: since
+$3\alpha - 2\beta > 2\alpha - \beta$ whenever $\alpha > \beta$, each cluster settles
+*smaller* than it would if it were the only one — the two clusters never collide with each
+other directly, but they still compete for the same shared pool of inactive agents during
+recruitment.
+
+## K hypotheses, distinct scores
+
+For $K$ clusters at distinct scores $\alpha_1,\dots,\alpha_K \in (\alpha_{\min},\,1)$, let
+
+$$S_1 = \sum_{k=1}^{K}\frac{1}{\alpha_k}, \qquad S_2 = \sum_{k=1}^{K}\frac{1}{\alpha_k^2}$$
+
+Solving the coupled fixed point gives a common term $X$ shared by every cluster:
+
+$$X = \frac{2 + S_1 - \beta - \beta S_2}{1 + K - \beta S_1}$$
+
+$$\bar c_k = X - \frac{1}{\alpha_k}$$
+
+Each cluster's steady-state size is this shared recruitment term $X$ minus its own
+$1/\alpha_k$ — so higher-scoring hypotheses claim proportionally more of the shared pool,
+at the expense of the others.
+
+**Validity / pruning.** This closed form only holds while every $\bar c_k > 0$. If
+$X \le 1/\alpha_k$ for some hypothesis, that hypothesis's score is too low relative to the
+current level of competition for it to sustain a cluster at all: drop it from the tracked
+set and recompute $X$ (and $S_1$, $S_2$) over the remaining survivors. In the worst case
+this requires iterating — removing the weakest surviving cluster and resolving — until
+every remaining $\bar c_k$ is positive.
+
+**Consistency check.** Setting $K=2$ and $\alpha_1=\alpha_2=\alpha$ in the general formula
+reproduces the two-equal-clusters result above exactly, and setting $K=1$ reduces to the
+single-cluster steady state from the DDSM.
+
+## Interpretation
+
+Standard SDS was criticised for winner-takes-all behaviour: two equal-scoring hypotheses
+don't split evenly, one cluster comes to dominate for long stretches before an unstable
+switch to the other. Context-sensitive diffusion was designed to fix this, and this model
+confirms it does — symmetric equal-score hypotheses reach the *same* steady-state cluster
+size independently, a genuinely stable coexistence rather than an unstable equilibrium.
+
+The general $K$-hypothesis result shows the cost of that fix: every additional coexisting
+cluster shrinks all the others, because they all draw from one shared inactive-agent pool
+even though they never collide with each other. Context-sensitive SDS distributes agents
+across all sufficiently-good hypotheses rather than concentrating on one, at the cost of
+each individual cluster being smaller and therefore less certain a detector of convergence.

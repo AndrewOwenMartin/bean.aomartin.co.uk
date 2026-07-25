@@ -14,7 +14,10 @@ import { Route as StandardSdsSummaryRouteImport } from './routes/standard-sds-su
 import { Route as HypothesisMutationRouteImport } from './routes/hypothesis-mutation'
 import { Route as FutureWorkRouteImport } from './routes/future-work'
 import { Route as DdsmRouteImport } from './routes/ddsm'
+import { Route as ContextSensitiveSdsSummaryRouteImport } from './routes/context-sensitive-sds-summary'
+import { Route as ContextSensitiveMultiClusterRouteImport } from './routes/context-sensitive-multi-cluster'
 import { Route as ContextFreeSensitiveRouteImport } from './routes/context-free-sensitive'
+import { Route as ContextFreeSdsSummaryRouteImport } from './routes/context-free-sds-summary'
 import { Route as IndexRouteImport } from './routes/index'
 
 const StoriesRoute = StoriesRouteImport.update({
@@ -42,9 +45,26 @@ const DdsmRoute = DdsmRouteImport.update({
   path: '/ddsm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContextSensitiveSdsSummaryRoute =
+  ContextSensitiveSdsSummaryRouteImport.update({
+    id: '/context-sensitive-sds-summary',
+    path: '/context-sensitive-sds-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ContextSensitiveMultiClusterRoute =
+  ContextSensitiveMultiClusterRouteImport.update({
+    id: '/context-sensitive-multi-cluster',
+    path: '/context-sensitive-multi-cluster',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ContextFreeSensitiveRoute = ContextFreeSensitiveRouteImport.update({
   id: '/context-free-sensitive',
   path: '/context-free-sensitive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContextFreeSdsSummaryRoute = ContextFreeSdsSummaryRouteImport.update({
+  id: '/context-free-sds-summary',
+  path: '/context-free-sds-summary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -55,7 +75,10 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/context-free-sds-summary': typeof ContextFreeSdsSummaryRoute
   '/context-free-sensitive': typeof ContextFreeSensitiveRoute
+  '/context-sensitive-multi-cluster': typeof ContextSensitiveMultiClusterRoute
+  '/context-sensitive-sds-summary': typeof ContextSensitiveSdsSummaryRoute
   '/ddsm': typeof DdsmRoute
   '/future-work': typeof FutureWorkRoute
   '/hypothesis-mutation': typeof HypothesisMutationRoute
@@ -64,7 +87,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/context-free-sds-summary': typeof ContextFreeSdsSummaryRoute
   '/context-free-sensitive': typeof ContextFreeSensitiveRoute
+  '/context-sensitive-multi-cluster': typeof ContextSensitiveMultiClusterRoute
+  '/context-sensitive-sds-summary': typeof ContextSensitiveSdsSummaryRoute
   '/ddsm': typeof DdsmRoute
   '/future-work': typeof FutureWorkRoute
   '/hypothesis-mutation': typeof HypothesisMutationRoute
@@ -74,7 +100,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/context-free-sds-summary': typeof ContextFreeSdsSummaryRoute
   '/context-free-sensitive': typeof ContextFreeSensitiveRoute
+  '/context-sensitive-multi-cluster': typeof ContextSensitiveMultiClusterRoute
+  '/context-sensitive-sds-summary': typeof ContextSensitiveSdsSummaryRoute
   '/ddsm': typeof DdsmRoute
   '/future-work': typeof FutureWorkRoute
   '/hypothesis-mutation': typeof HypothesisMutationRoute
@@ -85,7 +114,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/context-free-sds-summary'
     | '/context-free-sensitive'
+    | '/context-sensitive-multi-cluster'
+    | '/context-sensitive-sds-summary'
     | '/ddsm'
     | '/future-work'
     | '/hypothesis-mutation'
@@ -94,7 +126,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/context-free-sds-summary'
     | '/context-free-sensitive'
+    | '/context-sensitive-multi-cluster'
+    | '/context-sensitive-sds-summary'
     | '/ddsm'
     | '/future-work'
     | '/hypothesis-mutation'
@@ -103,7 +138,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/context-free-sds-summary'
     | '/context-free-sensitive'
+    | '/context-sensitive-multi-cluster'
+    | '/context-sensitive-sds-summary'
     | '/ddsm'
     | '/future-work'
     | '/hypothesis-mutation'
@@ -113,7 +151,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContextFreeSdsSummaryRoute: typeof ContextFreeSdsSummaryRoute
   ContextFreeSensitiveRoute: typeof ContextFreeSensitiveRoute
+  ContextSensitiveMultiClusterRoute: typeof ContextSensitiveMultiClusterRoute
+  ContextSensitiveSdsSummaryRoute: typeof ContextSensitiveSdsSummaryRoute
   DdsmRoute: typeof DdsmRoute
   FutureWorkRoute: typeof FutureWorkRoute
   HypothesisMutationRoute: typeof HypothesisMutationRoute
@@ -158,11 +199,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DdsmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/context-sensitive-sds-summary': {
+      id: '/context-sensitive-sds-summary'
+      path: '/context-sensitive-sds-summary'
+      fullPath: '/context-sensitive-sds-summary'
+      preLoaderRoute: typeof ContextSensitiveSdsSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/context-sensitive-multi-cluster': {
+      id: '/context-sensitive-multi-cluster'
+      path: '/context-sensitive-multi-cluster'
+      fullPath: '/context-sensitive-multi-cluster'
+      preLoaderRoute: typeof ContextSensitiveMultiClusterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/context-free-sensitive': {
       id: '/context-free-sensitive'
       path: '/context-free-sensitive'
       fullPath: '/context-free-sensitive'
       preLoaderRoute: typeof ContextFreeSensitiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/context-free-sds-summary': {
+      id: '/context-free-sds-summary'
+      path: '/context-free-sds-summary'
+      fullPath: '/context-free-sds-summary'
+      preLoaderRoute: typeof ContextFreeSdsSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -177,7 +239,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContextFreeSdsSummaryRoute: ContextFreeSdsSummaryRoute,
   ContextFreeSensitiveRoute: ContextFreeSensitiveRoute,
+  ContextSensitiveMultiClusterRoute: ContextSensitiveMultiClusterRoute,
+  ContextSensitiveSdsSummaryRoute: ContextSensitiveSdsSummaryRoute,
   DdsmRoute: DdsmRoute,
   FutureWorkRoute: FutureWorkRoute,
   HypothesisMutationRoute: HypothesisMutationRoute,

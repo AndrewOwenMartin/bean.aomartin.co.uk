@@ -65,7 +65,7 @@ export const MathComparison = () => (
           <InlineMath math="\dfrac{2\alpha(1-\beta)-1}{2(\alpha - \beta)}" />
         </td>
         <td>
-          <InlineMath math="\dfrac{\alpha(2-\beta)-1}{\alpha - \beta}" />
+          <InlineMath math="\dfrac{\alpha(2-\beta)-1}{2(\alpha - \beta)}" />
         </td>
       </tr>
     </tbody>
