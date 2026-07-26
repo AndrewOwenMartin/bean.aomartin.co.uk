@@ -19,8 +19,10 @@ export const TBoolean = (TM: TestSelector, hyp: Hyp): Agent => {
 };
 
 // Issue 08: multi-testing — run `amount` microtests and combine results
-export const TMultiTestingAnd: TestCombinator = (results) => results.every(Boolean);
-export const TMultiTestingOr: TestCombinator = (results) => results.some(Boolean);
+export const TMultiTestingAnd: TestCombinator = (results) =>
+  results.every(Boolean);
+export const TMultiTestingOr: TestCombinator = (results) =>
+  results.some(Boolean);
 
 export const TMultiTesting = (
   amount: number,
@@ -33,7 +35,11 @@ export const TMultiTesting = (
 });
 
 // Issue 09: secret optimist — failed tests are ignored with probability `optimism`
-export const TOptimist = (optimism: number, TM: TestSelector, hyp: Hyp): Agent => ({
+export const TOptimist = (
+  optimism: number,
+  TM: TestSelector,
+  hyp: Hyp,
+): Agent => ({
   hyp,
   active: TM()(hyp) || randChance(optimism),
 });

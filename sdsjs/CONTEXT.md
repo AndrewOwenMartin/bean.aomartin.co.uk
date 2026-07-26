@@ -25,6 +25,8 @@ Two representations are under development:
 
 **HashSwarm** (`hashmap/`) — stores only active agents as `Map<Hyp, count>`, where the count is the cluster size. WIP. The goal is to understand the performance and semantic tradeoffs vs ArraySwarm, not just to optimise.
 
+**DDSM** (`analysis/dynamicalSystemsModel.ts`) — not a `Swarm` implementation. This is a runnable simulation collapsing the search space to exactly two loci (the optimal hypothesis and homogeneous background noise), tracking only the proportion of the population in each `{locus} x {active, inactive}` cell rather than individual agents. Its purpose is to validate the closed-form Discrete Dynamical Systems Model derived in `thesis/003.2-mathematical-analysis-of-sds.md` by giving it a runnable counterpart, not to be an efficient production representation. Because there's no individual `Agent` to operate on, **D and T are not representation-agnostic here** — they're written directly in terms of population-wide proportions, unlike `immutable/` and `hashmap/` where D and T are shared and only I differs.
+
 ### Swarm Interface
 
 D and T are representation-agnostic. Only I needs a per-swarm implementation. The `Swarm` interface exposes:

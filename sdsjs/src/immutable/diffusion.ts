@@ -9,12 +9,12 @@ export type NoiseFunction = (hyp: Hyp) => Hyp;
 export const DPassive = (DH: DHFunction, agent: Agent, swarm: Swarm): Hyp => {
   /*
    * Standard Diffusion
-  */
+   */
   if (agent.active) {
     return agent.hyp;
   }
 
-  const polled = swarm.poll()
+  const polled = swarm.poll();
 
   const hyp = polled.active ? polled.hyp : DH();
 
@@ -29,22 +29,26 @@ export const DChance = (
 ): Hyp => {
   /*
    * Agents generate new hypotheses with probability P. Else perform passive diffusion.
-  */
+   */
   if (randChance(p)) {
     return DH();
   }
   return DPassive(DH, agent, swarm);
 };
 
-export const DContextFree = (DH: DHFunction, agent: Agent, swarm: Swarm): Hyp => {
+export const DContextFree = (
+  DH: DHFunction,
+  agent: Agent,
+  swarm: Swarm,
+): Hyp => {
   /*
    * Passive Diffusion + DH if both agents are active
    */
-  const polled = swarm.poll()
+  const polled = swarm.poll();
 
   // Generate a new hypothesis if both agents are active, or both are inactive.
   if (agent.active === polled.active) {
-    return DH()
+    return DH();
   }
 
   // If only polled is active, diffuse. If only agent is active, maintain.
@@ -58,23 +62,28 @@ export const DContextSensitive = (
 ): Hyp => {
   /*
    * Passive Diffusion + DH if both agents are active and share a hypothesis.
-  */
-  const polled = swarm.poll()
+   */
+  const polled = swarm.poll();
   if (!agent.active && polled.active) {
     return polled.hyp;
   }
   if (!agent.active || (polled.active && polled.hyp === agent.hyp)) {
     return DH();
   }
-  return agent.hyp
+  return agent.hyp;
 };
 
 export const DHUniform = (hypCount: number) => {
   // New Hypothesis selected uniformly at random
   return randInt(hypCount);
-}
+};
 
-export const DHermit = (hermitage: number, DH: DHFunction, agent: Agent, swarm: Swarm): Hyp => {
+export const DHermit = (
+  hermitage: number,
+  DH: DHFunction,
+  agent: Agent,
+  swarm: Swarm,
+): Hyp => {
   /*
    * Issue 05: hermit diffusion — active polled agents refuse to share with probability `hermitage`
    */
@@ -105,23 +114,30 @@ export const DMultiDiffusion = (
 };
 
 export const DMultiDiffusionOr: DiffusionCombinator = (polled) => {
-  const active = polled.filter(a => a.active);
+  const active = polled.filter((a) => a.active);
   return active.length > 0 ? choice(active) : null;
 };
 
 export const DMultiDiffusionAnd: DiffusionCombinator = (polled) =>
-  polled.every(a => a.active) ? choice(polled) : null;
+  polled.every((a) => a.active) ? choice(polled) : null;
 
 // Issue 07: noisy diffusion — apply a perturbation function to the recruited hypothesis
-export const DNoise = (noise: NoiseFunction, DH: DHFunction, agent: Agent, swarm: Swarm): Hyp => {
+export const DNoise = (
+  noise: NoiseFunction,
+  DH: DHFunction,
+  agent: Agent,
+  swarm: Swarm,
+): Hyp => {
   if (agent.active) return agent.hyp;
   const polled = swarm.poll();
   return polled.active ? noise(polled.hyp) : DH();
 };
 
-export const makeGaussianNoise = (sigma: number): NoiseFunction => (hyp) => {
-  const u1 = Math.random();
-  const u2 = Math.random();
-  const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-  return hyp + z * sigma;
-};
+export const makeGaussianNoise =
+  (sigma: number): NoiseFunction =>
+  (hyp) => {
+    const u1 = Math.random();
+    const u2 = Math.random();
+    const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+    return hyp + z * sigma;
+  };

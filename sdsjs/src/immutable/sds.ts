@@ -22,7 +22,7 @@ export const SDS: SDSDef = (
   return swarm;
 };
 
-type SDSSearch = (swarm: Swarm) => Swarm
+type SDSSearch = (swarm: Swarm) => Swarm;
 
 export const SDSStandard = (
   hypCount: number,

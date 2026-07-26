@@ -29,30 +29,54 @@ const largestClusterFraction = (swarm: Swarm): number => {
 const countUniqueHyps = (swarm: Swarm): number =>
   swarm.getClusters(Infinity, 1).size;
 
-export const makeHActivity = (threshold: number, getSwarm: () => Swarm): HaltingFn =>
-  () => getSwarm().getActivity() >= threshold;
+export const makeHActivity =
+  (threshold: number, getSwarm: () => Swarm): HaltingFn =>
+  () =>
+    getSwarm().getActivity() >= threshold;
 
-export const makeHLargest = (threshold: number, getSwarm: () => Swarm): HaltingFn =>
-  () => largestClusterFraction(getSwarm()) >= threshold;
+export const makeHLargest =
+  (threshold: number, getSwarm: () => Swarm): HaltingFn =>
+  () =>
+    largestClusterFraction(getSwarm()) >= threshold;
 
-export const makeHUnique = (uniqueCount: number, getSwarm: () => Swarm): HaltingFn =>
-  () => countUniqueHyps(getSwarm()) <= uniqueCount;
+export const makeHUnique =
+  (uniqueCount: number, getSwarm: () => Swarm): HaltingFn =>
+  () =>
+    countUniqueHyps(getSwarm()) <= uniqueCount;
 
 // Issue 14: convergence halting — halt when a measured value stays within [a-b, a+b] for T iterations
-export const makeHWeak = (a: number, b: number, T: number, getSwarm: () => Swarm): HaltingFn => {
+export const makeHWeak = (
+  a: number,
+  b: number,
+  T: number,
+  getSwarm: () => Swarm,
+): HaltingFn => {
   let t = 0;
   return () => {
     const activity = getSwarm().getActivity();
-    if (Math.abs(activity - a) < b) { t += 1; } else { t = 0; }
+    if (Math.abs(activity - a) < b) {
+      t += 1;
+    } else {
+      t = 0;
+    }
     return t >= T;
   };
 };
 
-export const makeHStrong = (a: number, b: number, T: number, getSwarm: () => Swarm): HaltingFn => {
+export const makeHStrong = (
+  a: number,
+  b: number,
+  T: number,
+  getSwarm: () => Swarm,
+): HaltingFn => {
   let t = 0;
   return () => {
     const fraction = largestClusterFraction(getSwarm());
-    if (Math.abs(fraction - a) < b) { t += 1; } else { t = 0; }
+    if (Math.abs(fraction - a) < b) {
+      t += 1;
+    } else {
+      t = 0;
+    }
     return t >= T;
   };
 };
@@ -61,7 +85,8 @@ export const makeHStrong = (a: number, b: number, T: number, getSwarm: () => Swa
 const standardDeviation = (values: number[]): number => {
   if (values.length < 2) return 0;
   const mean = values.reduce((a, b) => a + b, 0) / values.length;
-  const variance = values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length;
+  const variance =
+    values.reduce((sum, v) => sum + (v - mean) ** 2, 0) / values.length;
   return Math.sqrt(variance);
 };
 
@@ -88,8 +113,12 @@ export const makeHStable = (
 };
 
 // Issue 16: halting combinators
-export const HAnd = (...fns: HaltingFn[]): HaltingFn =>
-  () => fns.every(f => f());
+export const HAnd =
+  (...fns: HaltingFn[]): HaltingFn =>
+  () =>
+    fns.every((f) => f());
 
-export const HOr = (...fns: HaltingFn[]): HaltingFn =>
-  () => fns.some(f => f());
+export const HOr =
+  (...fns: HaltingFn[]): HaltingFn =>
+  () =>
+    fns.some((f) => f());

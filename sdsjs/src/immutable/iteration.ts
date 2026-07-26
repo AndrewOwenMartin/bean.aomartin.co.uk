@@ -3,9 +3,13 @@ import { Diffusion } from "./diffusion";
 import { TBoolean, TestSelector, Testing } from "./testing";
 
 export const ISynchronous = (D: Diffusion, T: Testing, swarm: Swarm): Swarm =>
-  swarm.forAll(agent => T(D(agent, swarm)));
+  swarm.forAll((agent) => T(D(agent, swarm)));
 
-export const IAsynchronous = (D: Diffusion, T: Testing, swarm: Swarm): Swarm => {
+export const IAsynchronous = (
+  D: Diffusion,
+  T: Testing,
+  swarm: Swarm,
+): Swarm => {
   let current = swarm;
   for (const agent of swarm.iter()) {
     const hyp = D(agent, current);

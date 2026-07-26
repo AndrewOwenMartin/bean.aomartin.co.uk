@@ -48,15 +48,15 @@ interface Cluster {
 }
 
 const mapToArrays = (clusters: Clusters): SwarmArrays => {
-  const hyps: number[] = []
-  const accumulatedClusterSizes: number[] = []
+  const hyps: number[] = [];
+  const accumulatedClusterSizes: number[] = [];
   let acc = 0;
   for (let [hyp, clusterSize] of clusters) {
     hyps.push(hyp);
     acc += clusterSize;
     accumulatedClusterSizes.push(acc);
   }
-  return {hyps, accumulatedClusterSizes};
+  return { hyps, accumulatedClusterSizes };
 };
 
 export const hashPollWithMaps = (
@@ -65,7 +65,7 @@ export const hashPollWithMaps = (
 ): Agent => {
   const agentIndex = randInt(agentCount);
 
-  const { hyps, accumulatedClusterSizes} = mapToArrays(clusters);
+  const { hyps, accumulatedClusterSizes } = mapToArrays(clusters);
 
   const clusterIndex = binarySearch(accumulatedClusterSizes, agentIndex);
 

@@ -4,4 +4,4 @@ export interface Agent {
   active: boolean;
 }
 
-export type Clusters = Map<Hyp, number>
+export type Clusters = Map<Hyp, number>;

@@ -111,7 +111,7 @@ export const makeHashSwarm = (
     for (let clusterSize of clusters.values()) {
       activeCount += clusterSize;
     }
-    return activeCount/agentCount
+    return activeCount / agentCount;
   }
 
   return {

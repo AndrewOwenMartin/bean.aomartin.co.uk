@@ -1,4 +1,4 @@
-import { expect, test } from '@jest/globals'
+import { expect, test } from "@jest/globals";
 import {
   DChance,
   DHermit,
@@ -62,8 +62,10 @@ test("DHermit: hermitage=1 always falls back to DH", () => {
   const swarm = initArraySwarm(1);
   swarm.agents[0] = { hyp: 5, active: true };
   const agent = { hyp: 0, active: false };
-  const results = Array.from({ length: 50 }, () => DHermit(1, () => 42, agent, swarm));
-  expect(results.every(r => r === 42)).toBe(true);
+  const results = Array.from({ length: 50 }, () =>
+    DHermit(1, () => 42, agent, swarm),
+  );
+  expect(results.every((r) => r === 42)).toBe(true);
 });
 
 test("DHermit: inactive polled agent falls back to DH", () => {
@@ -84,11 +86,19 @@ test("DMultiDiffusionOr: returns active agent when one is active", () => {
 });
 
 test("DMultiDiffusionAnd: returns null when not all active", () => {
-  expect(DMultiDiffusionAnd([{ hyp: 1, active: true }, { hyp: 2, active: false }])).toBeNull();
+  expect(
+    DMultiDiffusionAnd([
+      { hyp: 1, active: true },
+      { hyp: 2, active: false },
+    ]),
+  ).toBeNull();
 });
 
 test("DMultiDiffusionAnd: returns agent when all active", () => {
-  const agents = [{ hyp: 1, active: true }, { hyp: 2, active: true }];
+  const agents = [
+    { hyp: 1, active: true },
+    { hyp: 2, active: true },
+  ];
   const result = DMultiDiffusionAnd(agents);
   expect(result).not.toBeNull();
   expect(agents).toContain(result);
@@ -105,7 +115,9 @@ test("DMultiDiffusion: falls back to DH when combinator returns null", () => {
   swarm.agents[0] = { hyp: 1, active: false };
   swarm.agents[1] = { hyp: 2, active: false };
   const agent = { hyp: 0, active: false };
-  expect(DMultiDiffusion(2, DMultiDiffusionAnd, () => 99, agent, swarm)).toBe(99);
+  expect(DMultiDiffusion(2, DMultiDiffusionAnd, () => 99, agent, swarm)).toBe(
+    99,
+  );
 });
 
 test("DNoise: active agent keeps hypothesis unchanged", () => {
@@ -127,7 +139,14 @@ test("DNoise: falls back to DH when polled inactive", () => {
   const swarm = initArraySwarm(1);
   swarm.agents[0] = { hyp: 10, active: false };
   const agent = { hyp: 0, active: false };
-  expect(DNoise(h => h + 5, () => 99, agent, swarm)).toBe(99);
+  expect(
+    DNoise(
+      (h) => h + 5,
+      () => 99,
+      agent,
+      swarm,
+    ),
+  ).toBe(99);
 });
 
 test("makeGaussianNoise: returns a number near the input", () => {
@@ -157,18 +176,27 @@ test("TMultiTestingOr: all false → false", () => {
 
 test("TMultiTesting: amount=1 with always-passing test → active", () => {
   const TM = () => (_: number) => true;
-  expect(TMultiTesting(1, TMultiTestingAnd, TM, 5)).toEqual({ hyp: 5, active: true });
+  expect(TMultiTesting(1, TMultiTestingAnd, TM, 5)).toEqual({
+    hyp: 5,
+    active: true,
+  });
 });
 
 test("TMultiTesting: amount=3 AND with always-failing test → inactive", () => {
   const TM = () => (_: number) => false;
-  expect(TMultiTesting(3, TMultiTestingAnd, TM, 5)).toEqual({ hyp: 5, active: false });
+  expect(TMultiTesting(3, TMultiTestingAnd, TM, 5)).toEqual({
+    hyp: 5,
+    active: false,
+  });
 });
 
 test("TMultiTesting: amount=3 OR with one-passing test → active", () => {
   let call = 0;
   const TM = () => (_: number) => call++ === 1;
-  expect(TMultiTesting(3, TMultiTestingOr, TM, 5)).toEqual({ hyp: 5, active: true });
+  expect(TMultiTesting(3, TMultiTestingOr, TM, 5)).toEqual({
+    hyp: 5,
+    active: true,
+  });
 });
 
 test("TOptimist: optimism=0 behaves like TBoolean", () => {
@@ -180,7 +208,7 @@ test("TOptimist: optimism=0 behaves like TBoolean", () => {
 test("TOptimist: optimism=1 always active regardless of test result", () => {
   const TM = () => (_: number) => false;
   const results = Array.from({ length: 50 }, () => TOptimist(1, TM, 5));
-  expect(results.every(a => a.active)).toBe(true);
+  expect(results.every((a) => a.active)).toBe(true);
 });
 
 test("TOptimist: passing test always active", () => {
@@ -216,7 +244,7 @@ test("HIndefinite: always returns false", () => {
 test("makeHTime: returns false immediately then true after delay", async () => {
   const H = makeHTime(50);
   expect(H()).toBe(false);
-  await new Promise(r => setTimeout(r, 60));
+  await new Promise((r) => setTimeout(r, 60));
   expect(H()).toBe(true);
 });
 
@@ -268,7 +296,11 @@ test("makeHUnique: does not halt when too many unique hypotheses", () => {
 
 test("makeHWeak: halts after T consecutive in-band iterations", () => {
   let activity = 0.5;
-  const fakeSwarm = { getActivity: () => activity, agentCount: 10, getClusters: () => new Map() } as any;
+  const fakeSwarm = {
+    getActivity: () => activity,
+    agentCount: 10,
+    getClusters: () => new Map(),
+  } as any;
   const H = makeHWeak(0.5, 0.1, 3, () => fakeSwarm);
   expect(H()).toBe(false);
   expect(H()).toBe(false);
@@ -277,7 +309,11 @@ test("makeHWeak: halts after T consecutive in-band iterations", () => {
 
 test("makeHWeak: resets counter when out of band", () => {
   let activity = 0.5;
-  const fakeSwarm = { getActivity: () => activity, agentCount: 10, getClusters: () => new Map() } as any;
+  const fakeSwarm = {
+    getActivity: () => activity,
+    agentCount: 10,
+    getClusters: () => new Map(),
+  } as any;
   const H = makeHWeak(0.5, 0.1, 3, () => fakeSwarm);
   H();
   H();
@@ -302,7 +338,11 @@ test("makeHStrong: halts when largest cluster stays stable", () => {
 
 test("makeHStable: halts after minStableIterations consecutive stable iterations", () => {
   let activity = 0.5;
-  const fakeSwarm = { getActivity: () => activity, agentCount: 10, getClusters: () => new Map() } as any;
+  const fakeSwarm = {
+    getActivity: () => activity,
+    agentCount: 10,
+    getClusters: () => new Map(),
+  } as any;
   const H = makeHStable(10, 0.01, 3, () => fakeSwarm);
   expect(H()).toBe(false);
   expect(H()).toBe(false);
@@ -311,9 +351,14 @@ test("makeHStable: halts after minStableIterations consecutive stable iterations
 
 test("makeHStable: resets stable counter when activity becomes unstable", () => {
   let activity = 0.5;
-  const fakeSwarm = { getActivity: () => activity, agentCount: 10, getClusters: () => new Map() } as any;
+  const fakeSwarm = {
+    getActivity: () => activity,
+    agentCount: 10,
+    getClusters: () => new Map(),
+  } as any;
   const H = makeHStable(10, 0.01, 3, () => fakeSwarm);
-  H(); H(); // 2 stable iterations
+  H();
+  H(); // 2 stable iterations
   activity = 0; // inject noise to bust std dev
   activity = 1;
   H(); // now memory has [0.5, 0.5, 1.0] — std dev > 0.01 → reset
@@ -324,7 +369,10 @@ test("makeHStable: resets stable counter when activity becomes unstable", () => 
 test("HAnd: halts only when all functions halt", () => {
   let a = false;
   let b = false;
-  const H = HAnd(() => a, () => b);
+  const H = HAnd(
+    () => a,
+    () => b,
+  );
   expect(H()).toBe(false);
   a = true;
   expect(H()).toBe(false);
@@ -335,7 +383,10 @@ test("HAnd: halts only when all functions halt", () => {
 test("HOr: halts when any function halts", () => {
   let a = false;
   let b = false;
-  const H = HOr(() => a, () => b);
+  const H = HOr(
+    () => a,
+    () => b,
+  );
   expect(H()).toBe(false);
   a = true;
   expect(H()).toBe(true);

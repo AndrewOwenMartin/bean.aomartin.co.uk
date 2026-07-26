@@ -12,7 +12,11 @@ export {
   DNoise,
   makeGaussianNoise,
 } from "./immutable/diffusion";
-export type { DHFunction, DiffusionCombinator, NoiseFunction } from "./immutable/diffusion";
+export type {
+  DHFunction,
+  DiffusionCombinator,
+  NoiseFunction,
+} from "./immutable/diffusion";
 export {
   TBoolean,
   TMUniform,
@@ -22,7 +26,14 @@ export {
   TOptimist,
   TComparative,
 } from "./immutable/testing";
-export type { Microtest, Testing, TestSelector, TestCombinator, ScalarMicrotest, ScalarTestSelector } from "./immutable/testing";
+export type {
+  Microtest,
+  Testing,
+  TestSelector,
+  TestCombinator,
+  ScalarMicrotest,
+  ScalarTestSelector,
+} from "./immutable/testing";
 export {
   makeHFixed,
   makeHTime,
