@@ -155,7 +155,7 @@ export function useList<T>(initList: T[] | (() => T[])): ListHook<T> {
     return { action: newLength > prevLength ? "added" : "removed", newLength };
   };
 
-  const filter = (filterFunction?: (a: T) => boolean): void => {
+  const filter = (filterFunction: (a: T) => boolean): void => {
     set(listReducer(value, { type: "filter", filter: filterFunction }));
   };
 
