@@ -1,14 +1,14 @@
-.diff-anim {
+.anim-shell {
   margin: 2em 0;
 }
 
-.diff-anim-controls {
+.anim-controls {
   display: flex;
   gap: 0.5em;
   margin-bottom: 1em;
 }
 
-.diff-anim-controls button {
+.anim-controls button {
   padding: 0.3em 1em;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -17,18 +17,18 @@
   font-size: 0.9em;
 }
 
-.diff-anim-controls button:hover {
+.anim-controls button:hover {
   background: #f5f5f5;
 }
 
-.diff-anim-panels {
+.anim-panels {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5em;
   align-items: stretch;
 }
 
-.diff-anim-notes {
+.anim-notes {
   border-radius: 6px;
   padding: 0.5em;
   line-height: 1.7;
@@ -37,11 +37,11 @@
   min-width: 20em;
 }
 
-.diff-anim-code {
+.anim-code {
   width: 26em;
 }
 
-.diff-anim-code pre {
+.anim-code pre {
   margin: 0;
   padding: 0.5em;
   border-radius: 6px;
@@ -50,29 +50,16 @@
   border: 1px solid #e5e7eb;
 }
 
-.diff-anim-swarm {
+.anim-swarm {
   justify-content: center;
   align-items: flex-start;
   width: 26em;
 }
 
-.diff-anim-svg {
+.anim-svg {
   display: block;
 }
 
-.diff-anim-connector {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.diff-anim-connector.visible {
-  opacity: 1;
-}
-
-.diff-anim-agent {
-  transition: transform 0.35s ease;
-}
-
-.diff-anim-active-line {
+.anim-active-line {
   background: #fef9c3;
 }

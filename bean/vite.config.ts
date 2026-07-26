@@ -5,7 +5,6 @@ import mdx from '@mdx-js/rollup'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import remarkGfm from 'remark-gfm';
 
 // https://vite.dev/config/
@@ -22,12 +21,14 @@ export default defineConfig({
     ),
     react(),
     babel({ presets: [reactCompilerPreset()] }),
-    tsconfigPaths()
   ],
   css: {
     modules: {
       localsConvention: 'camelCaseOnly',
     },
+  },
+  resolve:{
+    tsconfigPaths: true,
   },
   server:{
     host: "0.0.0.0",

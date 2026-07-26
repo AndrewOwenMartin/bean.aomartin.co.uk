@@ -20,8 +20,7 @@
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
-    "sds": "*",
-    "vite-tsconfig-paths": "^6.1.1"
+    "sds": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
