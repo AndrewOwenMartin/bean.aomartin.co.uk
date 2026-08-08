@@ -25,10 +25,14 @@ cd sdsjs
 ./test.sh                                             # jest (all tests) — use this, not npm test directly
 ./test.sh src/immutable/__tests__/sds.test.ts         # single test file
 npm run build                                         # tsc
-npm run lint                                          # prettier then eslint
+npm run lint                                          # prettier --write then eslint --fix
 ```
 
 `test.sh` uses `npx jest` directly when a path is given, so the hardcoded `./src` glob in the npm script doesn't swallow the argument. Always use it instead of calling `npm test` directly.
+
+`npm run lint` runs `prettier --write ./src` before `eslint --fix` — reformatting the whole `src/` tree on every run is intentional, not a side effect to work around, so no need to scope-check `git status` after running it.
+
+`eslint` in `sdsjs` uses `eslint-plugin-react` (pinned alongside `eslint@^9.7.0`/`@eslint/js@^9.7.0`, since `eslint-plugin-react`'s latest release doesn't yet support eslint 10).
 
 ### bean
 

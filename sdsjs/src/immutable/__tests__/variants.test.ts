@@ -252,7 +252,7 @@ test("makeHActivity: halts when activity meets threshold", () => {
   const swarm = initArraySwarm(4);
   swarm.agents[0] = { hyp: 1, active: true };
   swarm.agents[1] = { hyp: 1, active: true };
-  let ref = swarm;
+  const ref = swarm;
   const H = makeHActivity(0.5, () => ref);
   expect(H()).toBe(true);
 });
@@ -260,7 +260,7 @@ test("makeHActivity: halts when activity meets threshold", () => {
 test("makeHActivity: does not halt below threshold", () => {
   const swarm = initArraySwarm(4);
   swarm.agents[0] = { hyp: 1, active: true };
-  let ref = swarm;
+  const ref = swarm;
   const H = makeHActivity(0.5, () => ref);
   expect(H()).toBe(false);
 });
@@ -270,7 +270,7 @@ test("makeHLargest: halts when largest cluster fraction meets threshold", () => 
   swarm.agents[0] = { hyp: 5, active: true };
   swarm.agents[1] = { hyp: 5, active: true };
   swarm.agents[2] = { hyp: 5, active: true };
-  let ref = swarm;
+  const ref = swarm;
   const H = makeHLargest(0.5, () => ref);
   expect(H()).toBe(true);
 });
@@ -279,7 +279,7 @@ test("makeHUnique: halts when unique hypotheses at or below threshold", () => {
   const swarm = initArraySwarm(4);
   swarm.agents[0] = { hyp: 1, active: true };
   swarm.agents[1] = { hyp: 2, active: true };
-  let ref = swarm;
+  const ref = swarm;
   const H = makeHUnique(2, () => ref);
   expect(H()).toBe(true);
 });
@@ -289,13 +289,13 @@ test("makeHUnique: does not halt when too many unique hypotheses", () => {
   swarm.agents[0] = { hyp: 1, active: true };
   swarm.agents[1] = { hyp: 2, active: true };
   swarm.agents[2] = { hyp: 3, active: true };
-  let ref = swarm;
+  const ref = swarm;
   const H = makeHUnique(2, () => ref);
   expect(H()).toBe(false);
 });
 
 test("makeHWeak: halts after T consecutive in-band iterations", () => {
-  let activity = 0.5;
+  const activity = 0.5;
   const fakeSwarm = {
     getActivity: () => activity,
     agentCount: 10,
@@ -330,14 +330,14 @@ test("makeHStrong: halts when largest cluster stays stable", () => {
   swarm.agents[0] = { hyp: 5, active: true };
   swarm.agents[1] = { hyp: 5, active: true };
   swarm.agents[2] = { hyp: 5, active: true };
-  let ref = swarm;
+  const ref = swarm;
   const H = makeHStrong(0.75, 0.1, 2, () => ref);
   expect(H()).toBe(false);
   expect(H()).toBe(true);
 });
 
 test("makeHStable: halts after minStableIterations consecutive stable iterations", () => {
-  let activity = 0.5;
+  const activity = 0.5;
   const fakeSwarm = {
     getActivity: () => activity,
     agentCount: 10,
@@ -382,7 +382,7 @@ test("HAnd: halts only when all functions halt", () => {
 
 test("HOr: halts when any function halts", () => {
   let a = false;
-  let b = false;
+  const b = false;
   const H = HOr(
     () => a,
     () => b,

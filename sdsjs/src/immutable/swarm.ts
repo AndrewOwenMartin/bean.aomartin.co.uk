@@ -85,7 +85,7 @@ export const makeHashSwarm = (
   function forAll(f: (agent: Agent) => Agent): HashSwarm {
     const clusters: Clusters = new Map<Hyp, number>();
     let agentCount = 0;
-    for (let agent of iter()) {
+    for (const agent of iter()) {
       const newAgent = f(agent);
       agentCount += 1;
       if (newAgent.active) {
@@ -108,7 +108,7 @@ export const makeHashSwarm = (
 
   function getActivity(): number {
     let activeCount: number = 0;
-    for (let clusterSize of clusters.values()) {
+    for (const clusterSize of clusters.values()) {
       activeCount += clusterSize;
     }
     return activeCount / agentCount;

@@ -20,7 +20,7 @@ export const hashPoll = (clusters: Clusters, agentCount: number): Agent => {
   const agentIndex = randInt(agentCount);
 
   let current = 0;
-  for (let [hyp, count] of clusters) {
+  for (const [hyp, count] of clusters) {
     current += count;
     if (current > agentIndex) {
       const agent: Agent = {
@@ -51,7 +51,7 @@ const mapToArrays = (clusters: Clusters): SwarmArrays => {
   const hyps: number[] = [];
   const accumulatedClusterSizes: number[] = [];
   let acc = 0;
-  for (let [hyp, clusterSize] of clusters) {
+  for (const [hyp, clusterSize] of clusters) {
     hyps.push(hyp);
     acc += clusterSize;
     accumulatedClusterSizes.push(acc);
@@ -79,7 +79,7 @@ const binarySearch = (sortedAccumulators: number[], target: number) => {
   let low = 0;
   let high = sortedAccumulators.length;
   while (low != high) {
-    let mid = (low + high) / 2;
+    const mid = (low + high) / 2;
     if (sortedAccumulators[mid] <= target) {
       low = mid + 1;
     } else {
